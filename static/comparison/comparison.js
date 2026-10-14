@@ -166,16 +166,12 @@ function preloadImages(row) {
     ['depth','preview'].map(kind=>previewAsset(row,frame.methods[method.id][kind]).pending))));
 }
 function warmOtherScenes(version) {
-  const run=()=>{
-    if(version!==sceneVersion)return;
-    for(const row of manifest.scenes)if(row.id!==scene.id) {
-      // Keep all four scenes' decoded previews and small video blobs for instant
-      // revisits. Full interactive point clouds remain demand-loaded.
-      Promise.all([preloadImages(row),cachedVideo(row)]).catch(()=>{});
-    }
-  };
-  if(globalThis.requestIdleCallback)requestIdleCallback(run,{timeout:1000});
-  else setTimeout(run,100);
+  if(version!==sceneVersion)return;
+  for(const row of manifest.scenes)if(row.id!==scene.id) {
+    // Queue all previews at startup. The scheduler still prioritizes the
+    // selected scene and limits background transfers to two at a time.
+    Promise.all([preloadImages(row),cachedVideo(row)]).catch(()=>{});
+  }
 }
 function displayPreview(panel, kind, url) {
   const image=previewCache.get(url);
@@ -249,11 +245,10 @@ function selectScene(row) {
       if(version!==sceneVersion)return;
       mediaReady=true;video.currentTime=Math.max(0,frameIndex)*.25;status.textContent='';
       if(playing)setPlaying(true);
-      warmOtherScenes(version);
     };
     if(video.readyState>=1)start();else video.addEventListener('loadedmetadata',start,{once:true});
   }).catch(error=>{if(version===sceneVersion){status.textContent='Preview assets unavailable';setPlaying(false);}console.error(error);});
-  scheduleMedia();
+  warmOtherScenes(version);scheduleMedia();
   setPlaying(true);
 }
 let pointer=null;
