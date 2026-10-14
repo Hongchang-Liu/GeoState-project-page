@@ -1,0 +1,38 @@
+:root{font-family:Inter,'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;color:#1e293b;font-synthesis:none;--border:#e2e8f0;--muted:#64748b;--blue:#2563eb}
+*{box-sizing:border-box}body{margin:0;background:transparent;font-size:12px;line-height:1.5}button,input{font:inherit}button{cursor:pointer;border:1px solid var(--border);border-radius:7px;background:#fff;color:inherit;padding:6px 10px}button:hover{background:#f8fafc;border-color:#94a3b8}button:focus,input:focus,[tabindex]:focus{outline:none}button:focus-visible{border-color:#64748b}button:disabled{opacity:.45;cursor:wait}
+.comparison{padding:4px 5px 8px;max-width:1040px;margin:auto}.card{border:1px solid var(--border);border-radius:16px;background:#fff;padding:18px;box-shadow:0 6px 22px #1e293b06}.board-scroll{overflow-x:auto;scrollbar-width:thin}.board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;min-width:750px;align-items:stretch}figure{margin:0;min-width:0}.method-column{display:flex;flex-direction:column;gap:8px}.depth-view,.cloud-view,.gt-media{position:relative;aspect-ratio:2;overflow:hidden;background:#fff;border-radius:6px}.depth-view img,.cloud-view img,.cloud-view canvas,.gt-media video{display:block;width:100%;height:100%;object-fit:contain}.cloud-view canvas{position:absolute;inset:0;visibility:hidden}.cloud-view.interactive canvas{visibility:visible}.cloud-view.interactive img{visibility:hidden}.cloud-view{touch-action:none;cursor:grab;border:1px solid #edf0f4}.cloud-view:active{cursor:grabbing}.gt-column{display:flex;flex-direction:column;justify-content:center;gap:8px;padding-bottom:27px}.gt-media{background:#f1f5f9}.board figcaption{text-align:center;font-size:11px;font-weight:600;white-space:nowrap;line-height:1.5;padding:2px 0}.method-column.ours figcaption{color:#1d4ed8}.method-column.ours .depth-view,.method-column.ours .cloud-view{box-shadow:0 0 0 1px #2563eb22}
+.timeline{display:flex;align-items:center;gap:11px;margin-top:18px;padding-top:15px;border-top:1px solid #f1f5f9}.timeline button{min-width:58px;font-weight:500}.timeline label{font-weight:500;white-space:nowrap}.timeline input{flex:1;min-width:60px;cursor:pointer;accent-color:var(--blue)}.timeline output{font-variant-numeric:tabular-nums;white-space:nowrap;min-width:66px;text-align:right;font-weight:600}.tools{display:flex;align-items:center;gap:8px;margin-top:10px;min-height:27px}.instructions{font-size:10px;color:#64748b}.tools button{margin-left:auto;font-size:10px;padding:4px 8px;white-space:nowrap}.tools [role=status]{font-size:10px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scenes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;max-width:700px;margin:20px auto 0}.scene{padding:0;border-radius:8px;overflow:hidden;border:2px solid transparent;background:#fff;transition:border-color .15s,box-shadow .15s}.scene img{display:block;width:100%;aspect-ratio:2;object-fit:cover}.scene .caption{display:flex;justify-content:center;align-items:center;gap:6px;padding:7px 5px;white-space:nowrap;font-size:11px}.scene .caption span{color:var(--muted);font-weight:400}.scene .caption strong{font-weight:600}.scene.selected{border-color:#2563eb}.scene:hover:not(.selected){border-color:#cbd5e1;box-shadow:0 3px 10px #1e293b08}.protocol{max-width:880px;margin:15px auto 0;font-size:11px;color:#475569}.protocol summary{cursor:pointer;font-size:10px;width:max-content}.protocol p{line-height:1.7;margin:8px 0}.protocol[open]{border-top:1px solid #f1f5f9;padding-top:10px}
+@media(max-width:680px){.comparison{padding:3px 1px 8px}.card{padding:12px;border-radius:12px}.board{min-width:735px;gap:8px}.timeline{gap:7px}.timeline label{font-size:10px}.timeline button{min-width:49px;padding:5px 7px;font-size:10px}.timeline output{font-size:11px;min-width:60px}.tools{flex-wrap:wrap;gap:5px}.instructions{font-size:9px}.scenes{gap:6px;margin-top:14px}.scene .caption{font-size:9px;gap:3px;padding:5px 2px}.protocol{padding:0 3px}}
+@media(prefers-reduced-motion:reduce){button,.scene{transition:none}}
+/* Match the parent's desktop container instead of retaining a narrow inner cap. */
+.comparison{max-width:1344px}
+
+/* Paper-result charts share the existing viewer's typography and blue accents. */
+.section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:17px}
+.section-heading h2{margin:0;font-size:18px;font-weight:600;letter-spacing:-.025em;color:#1e293b}
+.quantitative{margin-top:32px;margin-bottom:0;padding:20px 24px 18px}
+.metric-label{font-size:12px;font-weight:500;color:#64748b;margin-right:6px;white-space:nowrap}
+.chart-legend{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px 25px;margin:0 0 10px;font-size:12px;color:#475569}
+.chart-legend span{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.chart-legend i{width:11px;height:11px;display:block;border-radius:3px;flex-shrink:0}
+.chart-legend .ours-legend{color:#174a9c;font-weight:600}
+.bar-chart svg{display:block;width:100%;max-width:100%;font-family:inherit;overflow:visible}
+.plot-title{font-size:16px;font-weight:600;fill:#1e293b;letter-spacing:-.02em}
+.plot-subtitle{font-size:10px;font-weight:500;fill:#64748b}
+.chart-grid{stroke:#edf1f6;stroke-width:1}
+.chart-baseline{stroke:#cad5e2;stroke-width:1}
+.axis-tick{font-size:11px;fill:#7b8ba1;font-variant-numeric:tabular-nums}
+.axis-caption{font-size:11px;fill:#64748b}
+.horizon-label{font-size:12px;fill:#475569;font-variant-numeric:tabular-nums}
+.bar-value{font-size:11px;fill:#64748b;font-variant-numeric:tabular-nums}
+.compact-value{font-size:10px}
+.ours-value{fill:#174a9c;font-weight:600}
+.chart-bar{transition:opacity .12s}
+.chart-bar:hover,.chart-bar:focus-visible{opacity:.78;outline:none;stroke:#1e293b;stroke-width:1}
+.qualitative-heading{margin-bottom:13px;padding:0 3px}
+.timeline #play{min-width:36px;width:36px;height:32px;display:grid;place-items:center;padding:6px}
+.timeline #play svg{display:block;width:17px;height:17px;fill:currentColor}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:680px){.quantitative{padding:15px 10px 13px;margin-top:24px}.section-heading{gap:8px}.section-heading h2{font-size:15px}.metric-label{font-size:10px;margin-right:1px}.chart-legend{display:grid;grid-template-columns:auto auto;justify-content:center;gap:7px 20px;font-size:11px;margin-bottom:11px}.horizon-label{font-size:10px}.timeline #play{min-width:32px;width:32px;height:28px}}
+@media(prefers-reduced-motion:reduce){.chart-bar{transition:none}}

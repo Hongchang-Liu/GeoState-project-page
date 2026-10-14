@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GeoState interactive scene query</title>
+  <link rel="stylesheet" href="demo.css?v=20261013-pointmap-controls">
+</head>
+<body>
+<main class="demo" id="demo">
+  <div class="intro"><p>Same future scene state. Your viewpoint.</p></div>
+  <div class="workspace">
+    <div class="main-grid">
+      <figure class="world-panel"><div class="panel-heading"><strong>Pred State · Your view</strong><div class="keyboard-guide"><p><span><kbd>W</kbd><kbd>S</kbd> Forward / back</span><span><kbd>A</kbd><kbd>D</kbd> Left / right</span><span><kbd>Q</kbd><kbd>E</kbd> Up / down</span><span><kbd>←</kbd><kbd>→</kbd> Yaw · <kbd>↑</kbd><kbd>↓</kbd> Pitch</span></p></div></div><div class="query-viewport" id="query-viewport" tabindex="0" aria-label="Query camera: use WASD and QE to move, arrow keys to rotate"><img id="world" alt="World Model depth at the query camera"></div></figure>
+      <div class="observer-panel"><div class="panel-heading"><strong>Pointmap</strong><div class="pointmap-tools"><div class="pointmap-guide"><span>Drag to orbit</span><span>Shift-drag to pan</span><span>Scroll to zoom</span></div><button id="fit" type="button">Fit all cameras</button></div></div><canvas id="camera-map" tabindex="0" title="Left drag: rotate. Right drag or Shift + left drag: pan. Scroll: zoom." aria-label="Predicted point cloud and camera frusta; left drag to orbit, right drag or Shift plus left drag to pan, scroll to zoom; keyboard controls the query camera"></canvas><div class="camera-legend"><span><i class="history"></i>Past GT view</span><span><i></i>Current GT view</span><span><i class="query"></i>Your query view</span></div></div>
+    </div>
+    <div class="comparison-grid">
+      <figure><div class="panel-heading"><strong>Copy-Last state · Pred view</strong></div><div class="small-view"><img id="copy" alt="Cached Copy-Last depth at the GT camera for the selected time"></div></figure>
+      <figure><div class="panel-heading"><strong>Future RGB</strong></div><div class="small-view"><img id="rgb" alt="Actual future RGB, not model-generated"></div></figure>
+      <figure><div class="panel-heading"><strong>Pred State · Pred view</strong></div><div class="small-view"><img id="gt" alt="Cached World Model depth at the actual future GT camera"></div></figure>
+      <aside class="dashboard" aria-label="Camera dashboard"><div class="panel-heading"><strong>Dashboard</strong></div><div class="dashboard-content"><span id="status" role="status" class="status">Loading assets</span><div class="pose-readouts"><div>Right / left <output id="x-value">0.0 m</output></div><div>Down / up <output id="y-value">0.0 m</output></div><div>Forward / back <output id="z-value">0.0 m</output></div><div>Yaw <output id="yaw-value">0°</output></div><div>Pitch <output id="pitch-value">0°</output></div><button id="reset" type="button">Reset offsets</button></div><div class="depth-key"><span>Near · 10.3 m</span><span class="turbo-key" aria-label="Turbo inverse-depth color scale"></span><span>Far · 70.0 m</span></div></div></aside>
+    </div>
+  </div>
+  <div class="timeline"><button id="play" type="button" aria-label="Play future sequence">▶</button><label for="time">Future time</label><input id="time" type="range" min="0" max="10" step="1" value="0" aria-valuetext=""><output id="time-value">t + 0.00 s</output><div id="time-ticks" class="time-ticks"></div></div>
+  <section class="selector" aria-label="Scene selection"><div class="selector-heading"><h2>Choose a scene</h2><span id="page-label">30 hand-picked examples</span></div><div class="scene-pages"><button id="previous" class="page-arrow" type="button" aria-label="Previous ten scenes">‹</button><div class="scene-grid" id="scenes"></div><button id="next" class="page-arrow" type="button" aria-label="Next ten scenes">›</button></div><div id="page-dots" class="page-dots" aria-label="Scene pages"></div></section>
+</main>
+<script type="module" src="demo.js?v=20261013-default-geometry-cache"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+{
+  "source": {
+    "paper": "iclr_paper_GeoState (15).pdf",
+    "tables": {"waymo": 1, "kitti": 2, "nuscenes": 2},
+    "pages": {"waymo": 7, "kitti": 8, "nuscenes": 8},
+    "metric": "AbsRel",
+    "camera": "Pred.",
+    "note": "Reported paper results, not a new evaluation. FR3D values are quoted from its original paper; scale handling and preprocessing follow each method's stated protocol."
+  },
+  "methods": [
+    {"id": "dino_foresight", "label": "DINO-Foresight", "color": "#a6c9ed"},
+    {"id": "vggt_world", "label": "VGGT-World", "color": "#709fd6"},
+    {"id": "fr3d", "label": "FR3D", "color": "#3974bd"},
+    {"id": "ours", "label": "Ours (Pred.)", "color": "#174a9c"}
+  ],
+  "datasets": {
+    "waymo": {
+      "label": "Waymo", "zero_shot": false, "horizons": [0.2, 0.6, 1.0, 2.0],
+      "values": {
+        "dino_foresight": [0.119, 0.138, 0.151, 0.243],
+        "vggt_world": [0.073, 0.112, 0.143, 0.213],
+        "fr3d": [0.110, 0.121, 0.131, 0.152],
+        "ours": [0.065, 0.079, 0.092, 0.127]
+      }
+    },
+    "kitti": {
+      "label": "KITTI", "zero_shot": true, "horizons": [0.6, 1.0, 2.0],
+      "values": {
+        "dino_foresight": [0.131, 0.161, 0.195],
+        "vggt_world": [0.109, 0.127, 0.198],
+        "fr3d": [0.116, 0.132, 0.178],
+        "ours": [0.095, 0.112, 0.155]
+      }
+    },
+    "nuscenes": {
+      "label": "nuScenes", "zero_shot": true, "horizons": [0.75, 1.25, 2.5],
+      "values": {
+        "dino_foresight": [0.231, 0.253, 0.291],
+        "vggt_world": [0.228, 0.241, 0.282],
+        "fr3d": [0.182, 0.197, 0.229],
+        "ours": [0.136, 0.172, 0.213]
+      }
+    }
+  }
+}

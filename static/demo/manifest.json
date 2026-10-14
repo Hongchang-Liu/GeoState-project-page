@@ -1,0 +1,249 @@
+{
+  "scenes": [
+    {
+      "id": "WM024",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "4392459808686681511_5006_200_5026_200",
+      "split": "train",
+      "thumbnail": "assets/WM024/thumb.webp"
+    },
+    {
+      "id": "WM020",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "972142630887801133_642_740_662_740",
+      "split": "train",
+      "thumbnail": "assets/WM020/thumb.webp"
+    },
+    {
+      "id": "WM181",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "12496433400137459534_120_000_140_000",
+      "split": "validation",
+      "thumbnail": "assets/WM181/thumb.webp"
+    },
+    {
+      "id": "WM002",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "15535062863944567958_1100_000_1120_000",
+      "split": "train",
+      "thumbnail": "assets/WM002/thumb.webp"
+    },
+    {
+      "id": "WM005",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "15331851695963211598_1620_000_1640_000",
+      "split": "train",
+      "thumbnail": "assets/WM005/thumb.webp"
+    },
+    {
+      "id": "WM022",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "6207195415812436731_805_000_825_000",
+      "split": "train",
+      "thumbnail": "assets/WM022/thumb.webp"
+    },
+    {
+      "id": "WM062",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "17752423643206316420_920_850_940_850",
+      "split": "train",
+      "thumbnail": "assets/WM062/thumb.webp"
+    },
+    {
+      "id": "WM095",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "14486517341017504003_3406_349_3426_349",
+      "split": "validation",
+      "thumbnail": "assets/WM095/thumb.webp"
+    },
+    {
+      "id": "WM007",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "16202688197024602345_3818_820_3838_820",
+      "split": "train",
+      "thumbnail": "assets/WM007/thumb.webp"
+    },
+    {
+      "id": "WM031",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "13182548552824592684_4160_250_4180_250",
+      "split": "train",
+      "thumbnail": "assets/WM031/thumb.webp"
+    },
+    {
+      "id": "WM032",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "15578655130939579324_620_000_640_000",
+      "split": "train",
+      "thumbnail": "assets/WM032/thumb.webp"
+    },
+    {
+      "id": "WM036",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "10664823084372323928_4360_000_4380_000",
+      "split": "train",
+      "thumbnail": "assets/WM036/thumb.webp"
+    },
+    {
+      "id": "WM008",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "12161824480686739258_1813_380_1833_380",
+      "split": "train",
+      "thumbnail": "assets/WM008/thumb.webp"
+    },
+    {
+      "id": "WM070",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "11940460932056521663_1760_000_1780_000",
+      "split": "train",
+      "thumbnail": "assets/WM070/thumb.webp"
+    },
+    {
+      "id": "WM082",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "4191035366928259953_1732_708_1752_708",
+      "split": "train",
+      "thumbnail": "assets/WM082/thumb.webp"
+    },
+    {
+      "id": "WM186",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "5835049423600303130_180_000_200_000",
+      "split": "train",
+      "thumbnail": "assets/WM186/thumb.webp"
+    },
+    {
+      "id": "WM195",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "13184115878756336167_1354_000_1374_000",
+      "split": "validation",
+      "thumbnail": "assets/WM195/thumb.webp"
+    },
+    {
+      "id": "WM210",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "6259508587655502768_780_000_800_000",
+      "split": "testing_location",
+      "thumbnail": "assets/WM210/thumb.webp"
+    },
+    {
+      "id": "WM014",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "17295069199227237940_3160_000_3180_000",
+      "split": "train",
+      "thumbnail": "assets/WM014/thumb.webp"
+    },
+    {
+      "id": "WM018",
+      "dataset": "waymo",
+      "zero_shot": false,
+      "item_id": "5372281728627437618_2005_000_2025_000",
+      "split": "validation",
+      "thumbnail": "assets/WM018/thumb.webp"
+    },
+    {
+      "id": "WM104",
+      "dataset": "kitti",
+      "zero_shot": true,
+      "item_id": "2011_09_26/2011_09_26_drive_0104_sync",
+      "split": "train",
+      "thumbnail": "assets/WM104/thumb.webp"
+    },
+    {
+      "id": "KM001",
+      "dataset": "kitti",
+      "zero_shot": true,
+      "item_id": "2011_09_26/2011_09_26_drive_0057_sync",
+      "split": "train",
+      "thumbnail": "assets/KM001/thumb.webp"
+    },
+    {
+      "id": "KM004",
+      "dataset": "kitti",
+      "zero_shot": true,
+      "item_id": "2011_09_26/2011_09_26_drive_0059_sync",
+      "split": "train",
+      "thumbnail": "assets/KM004/thumb.webp"
+    },
+    {
+      "id": "KM005",
+      "dataset": "kitti",
+      "zero_shot": true,
+      "item_id": "2011_09_26/2011_09_26_drive_0015_sync",
+      "split": "train",
+      "thumbnail": "assets/KM005/thumb.webp"
+    },
+    {
+      "id": "KM018",
+      "dataset": "kitti",
+      "zero_shot": true,
+      "item_id": "2011_09_26/2011_09_26_drive_0032_sync",
+      "split": "train",
+      "thumbnail": "assets/KM018/thumb.webp"
+    },
+    {
+      "id": "WM261",
+      "dataset": "nuscenes",
+      "zero_shot": true,
+      "item_id": "scene-0099_a1533151423662404",
+      "split": "val",
+      "thumbnail": "assets/WM261/thumb.webp"
+    },
+    {
+      "id": "WM264",
+      "dataset": "nuscenes",
+      "zero_shot": true,
+      "item_id": "scene-1068_a1542799613162460",
+      "split": "val",
+      "thumbnail": "assets/WM264/thumb.webp"
+    },
+    {
+      "id": "WM121",
+      "dataset": "nuscenes",
+      "zero_shot": true,
+      "item_id": "scene-0560",
+      "split": "val",
+      "thumbnail": "assets/WM121/thumb.webp"
+    },
+    {
+      "id": "WM123",
+      "dataset": "nuscenes",
+      "zero_shot": true,
+      "item_id": "scene-0104",
+      "split": "val",
+      "thumbnail": "assets/WM123/thumb.webp"
+    },
+    {
+      "id": "WM124",
+      "dataset": "nuscenes",
+      "zero_shot": true,
+      "item_id": "scene-0520",
+      "split": "val",
+      "thumbnail": "assets/WM124/thumb.webp"
+    }
+  ],
+  "depth_bounds_m": [
+    10.292600021362304,
+    70.03740036010743
+  ],
+  "selection": "Manually selected qualitative examples; not an unbiased benchmark sample."
+}

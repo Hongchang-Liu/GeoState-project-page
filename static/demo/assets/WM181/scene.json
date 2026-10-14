@@ -1,0 +1,517 @@
+{
+  "id": "WM181",
+  "dataset": "waymo",
+  "zero_shot": false,
+  "item_id": "12496433400137459534_120_000_140_000",
+  "split": "validation",
+  "anchor": "assets/WM181/anchor.webp",
+  "thumbnail": "assets/WM181/thumb.webp",
+  "frames": [
+    {
+      "seconds": 0.2,
+      "rgb": "assets/WM181/rgb-01.webp",
+      "gt_depth": "assets/WM181/gt-01.webp",
+      "copy_depth": "assets/WM181/copy-01.webp",
+      "fixed_depth": "assets/WM181/fixed-01.webp",
+      "fixed_copy_depth": "assets/WM181/fixed-00.webp",
+      "fixed_pointcloud": "assets/WM181/fixed-cloud-full-v3-01.bin.gz"
+    },
+    {
+      "seconds": 0.4,
+      "rgb": "assets/WM181/rgb-02.webp",
+      "gt_depth": "assets/WM181/gt-02.webp",
+      "copy_depth": "assets/WM181/copy-02.webp",
+      "fixed_depth": "assets/WM181/fixed-02.webp",
+      "fixed_copy_depth": "assets/WM181/fixed-00.webp",
+      "fixed_pointcloud": "assets/WM181/fixed-cloud-full-v3-02.bin.gz"
+    },
+    {
+      "seconds": 0.6,
+      "rgb": "assets/WM181/rgb-03.webp",
+      "gt_depth": "assets/WM181/gt-03.webp",
+      "copy_depth": "assets/WM181/copy-03.webp",
+      "fixed_depth": "assets/WM181/fixed-03.webp",
+      "fixed_copy_depth": "assets/WM181/fixed-00.webp",
+      "fixed_pointcloud": "assets/WM181/fixed-cloud-full-v3-03.bin.gz"
+    },
+    {
+      "seconds": 0.8,
+      "rgb": "assets/WM181/rgb-04.webp",
+      "gt_depth": "assets/WM181/gt-04.webp",
+      "copy_depth": "assets/WM181/copy-04.webp",
+      "fixed_depth": "assets/WM181/fixed-04.webp",
+      "fixed_copy_depth": "assets/WM181/fixed-00.webp",
+      "fixed_pointcloud": "assets/WM181/fixed-cloud-full-v3-04.bin.gz"
+    },
+    {
+      "seconds": 1.0,
+      "rgb": "assets/WM181/rgb-05.webp",
+      "gt_depth": "assets/WM181/gt-05.webp",
+      "copy_depth": "assets/WM181/copy-05.webp",
+      "fixed_depth": "assets/WM181/fixed-05.webp",
+      "fixed_copy_depth": "assets/WM181/fixed-00.webp",
+      "fixed_pointcloud": "assets/WM181/fixed-cloud-full-v3-05.bin.gz"
+    },
+    {
+      "seconds": 1.2,
+      "rgb": "assets/WM181/rgb-06.webp",
+      "gt_depth": "assets/WM181/gt-06.webp",
+      "copy_depth": "assets/WM181/copy-06.webp",
+      "fixed_depth": "assets/WM181/fixed-06.webp",
+      "fixed_copy_depth": "assets/WM181/fixed-00.webp",
+      "fixed_pointcloud": "assets/WM181/fixed-cloud-full-v3-06.bin.gz"
+    },
+    {
+      "seconds": 1.4,
+      "rgb": "assets/WM181/rgb-07.webp",
+      "gt_depth": "assets/WM181/gt-07.webp",
+      "copy_depth": "assets/WM181/copy-07.webp",
+      "fixed_depth": "assets/WM181/fixed-07.webp",
+      "fixed_copy_depth": "assets/WM181/fixed-00.webp",
+      "fixed_pointcloud": "assets/WM181/fixed-cloud-full-v3-07.bin.gz"
+    },
+    {
+      "seconds": 1.6,
+      "rgb": "assets/WM181/rgb-08.webp",
+      "gt_depth": "assets/WM181/gt-08.webp",
+      "copy_depth": "assets/WM181/copy-08.webp",
+      "fixed_depth": "assets/WM181/fixed-08.webp",
+      "fixed_copy_depth": "assets/WM181/fixed-00.webp",
+      "fixed_pointcloud": "assets/WM181/fixed-cloud-full-v3-08.bin.gz"
+    },
+    {
+      "seconds": 1.8,
+      "rgb": "assets/WM181/rgb-09.webp",
+      "gt_depth": "assets/WM181/gt-09.webp",
+      "copy_depth": "assets/WM181/copy-09.webp",
+      "fixed_depth": "assets/WM181/fixed-09.webp",
+      "fixed_copy_depth": "assets/WM181/fixed-00.webp",
+      "fixed_pointcloud": "assets/WM181/fixed-cloud-full-v3-09.bin.gz"
+    },
+    {
+      "seconds": 2.0,
+      "rgb": "assets/WM181/rgb-10.webp",
+      "gt_depth": "assets/WM181/gt-10.webp",
+      "copy_depth": "assets/WM181/copy-10.webp",
+      "fixed_depth": "assets/WM181/fixed-10.webp",
+      "fixed_copy_depth": "assets/WM181/fixed-00.webp",
+      "fixed_pointcloud": "assets/WM181/fixed-cloud-full-v3-10.bin.gz"
+    }
+  ],
+  "depth_bounds_m": [
+    10.292600021362304,
+    70.03740036010743
+  ],
+  "camera_convention": "OpenCV camera-to-world; anchor FRONT, metres",
+  "camera_metadata_ready": true,
+  "history_poses": [
+    [
+      [
+        0.9999997615814209,
+        -0.0003837012918666005,
+        -0.0005538045079447329,
+        -0.0021315168123692274
+      ],
+      [
+        0.00038465962279587984,
+        0.9999984502792358,
+        0.0017318845493718982,
+        -0.00029274143162183464
+      ],
+      [
+        0.0005531368660740554,
+        -0.0017320970073342323,
+        0.9999983310699463,
+        -0.15489189326763153
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999997615814209,
+        -9.469476208323613e-05,
+        -0.0006527563091367483,
+        -0.0026767337694764137
+      ],
+      [
+        9.563874482410029e-05,
+        0.999998927116394,
+        0.0014463099651038647,
+        0.00010090094292536378
+      ],
+      [
+        0.000652619986794889,
+        -0.001446372363716364,
+        0.9999987483024597,
+        -0.13151781260967255
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999999403953552,
+        3.414008631352772e-07,
+        -0.0003724230919033289,
+        -0.002098779659718275
+      ],
+      [
+        -1.8115761335479874e-08,
+        0.9999996423721313,
+        0.0008676996803842485,
+        -0.00012264377437531948
+      ],
+      [
+        0.00037242655525915325,
+        -0.0008677001460455358,
+        0.9999995827674866,
+        -0.08273933082818985
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  ],
+  "gt_poses": [
+    [
+      [
+        0.9999994039535522,
+        -2.726312231970951e-06,
+        0.0011356730246916413,
+        0.004363861866295338
+      ],
+      [
+        4.049950348417042e-06,
+        0.9999993443489075,
+        -0.001165110501460731,
+        -0.0006552747800014913
+      ],
+      [
+        -0.0011356726754456758,
+        0.0011651141103357077,
+        0.9999986886978149,
+        0.1288866102695465
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999944567680359,
+        -9.935271373251453e-05,
+        0.003318361472338438,
+        0.009181101806461811
+      ],
+      [
+        0.00010904040391324088,
+        0.999995768070221,
+        -0.0029191505163908005,
+        -0.0015092488611117005
+      ],
+      [
+        -0.0033180497121065855,
+        0.0029194962698966265,
+        0.9999902844429016,
+        0.3101232945919037
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999769330024719,
+        -0.0004981149104423821,
+        0.006773631554096937,
+        0.01798247918486595
+      ],
+      [
+        0.0005156070692464709,
+        0.999996542930603,
+        -0.0025808215141296387,
+        -0.002536176238209009
+      ],
+      [
+        -0.006772323045879602,
+        0.002584254601970315,
+        0.999973714351654,
+        0.5518158674240112
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999383687973022,
+        -0.000518046144861728,
+        0.011091042309999466,
+        0.02868296205997467
+      ],
+      [
+        0.000544122711289674,
+        0.9999971389770508,
+        -0.0023482092656195164,
+        -0.004129465203732252
+      ],
+      [
+        -0.011089790612459183,
+        0.0023540991824120283,
+        0.9999358057975769,
+        0.8528250455856323
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999023079872131,
+        0.0005299171898514032,
+        0.013965216465294361,
+        0.03745023533701897
+      ],
+      [
+        -0.0004926837864331901,
+        0.9999963045120239,
+        -0.0026694817934185266,
+        -0.00600180309265852
+      ],
+      [
+        -0.013966580852866173,
+        0.0026623401790857315,
+        0.9998989105224609,
+        1.2092503309249878
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9998703598976135,
+        0.000903873355127871,
+        0.016075924038887024,
+        0.047952912747859955
+      ],
+      [
+        -0.0008621950983069837,
+        0.9999962449073792,
+        -0.0025993548333644867,
+        -0.007618916220963001
+      ],
+      [
+        -0.01607820950448513,
+        0.0025851568207144737,
+        0.9998674392700195,
+        1.6232972145080566
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.999858558177948,
+        -0.00039770439616404474,
+        0.016812041401863098,
+        0.06206440553069115
+      ],
+      [
+        0.00047876403550617397,
+        0.999988317489624,
+        -0.00481769535690546,
+        -0.010068433359265327
+      ],
+      [
+        -0.016809923574328423,
+        0.004825062584131956,
+        0.9998470544815063,
+        2.091820478439331
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9998509287834167,
+        -0.0016367187490686774,
+        0.017188142985105515,
+        0.0768854171037674
+      ],
+      [
+        0.0017264930065721273,
+        0.9999849796295166,
+        -0.005209466442465782,
+        -0.013086658902466297
+      ],
+      [
+        -0.01717936247587204,
+        0.0052383653819561005,
+        0.9998387098312378,
+        2.620027542114258
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9998438358306885,
+        -0.00019942571816500276,
+        0.017670156434178352,
+        0.08783334493637085
+      ],
+      [
+        0.00029155839001759887,
+        0.9999864101409912,
+        -0.00521157355979085,
+        -0.0180401261895895
+      ],
+      [
+        -0.017668869346380234,
+        0.005215911194682121,
+        0.9998303055763245,
+        3.2088680267333984
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9998405575752258,
+        -0.00046740638208575547,
+        0.01784910261631012,
+        0.10306286811828613
+      ],
+      [
+        0.0005776803009212017,
+        0.9999808073043823,
+        -0.006173443514853716,
+        -0.022791767492890358
+      ],
+      [
+        -0.017845867201685905,
+        0.006182770244777203,
+        0.999821662902832,
+        3.8586275577545166
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  ],
+  "history_seconds": [
+    -0.6,
+    -0.4,
+    -0.2,
+    0.0
+  ],
+  "intrinsics": [
+    [
+      664.4652099609375,
+      0.0,
+      308.61175537109375
+    ],
+    [
+      0.0,
+      664.4652099609375,
+      205.80372619628906
+    ],
+    [
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "pointcloud_annotation": "Predicted depth; future GT RGB colors for display only; not predicted RGB.",
+  "anchor_frame": {
+    "seconds": 0.0,
+    "rgb": "assets/WM181/anchor.webp",
+    "gt_depth": "assets/WM181/fixed-00.webp",
+    "copy_depth": "assets/WM181/fixed-00.webp",
+    "fixed_depth": "assets/WM181/fixed-00.webp",
+    "fixed_copy_depth": "assets/WM181/fixed-00.webp",
+    "fixed_pointcloud": "assets/WM181/fixed-cloud-full-v3-00.bin.gz"
+  },
+  "pointcloud_filter": {
+    "version": "sky_connected_full_v3",
+    "raster_stride": 1,
+    "purpose": "Display only; depth predictions, RGB and evaluation masks are unchanged.",
+    "support": "One consistent neighbour in the eight-neighbour raster is sufficient.",
+    "sky_annotation": "Unchanged offline GT RGB sky masks; not a forecast input.",
+    "geometry": "Real samples from original full-resolution depth; no interpolation, smoothing or rescaling.",
+    "visibility": "Prediction-only source z-buffer, never ground-truth depth."
+  }
+}

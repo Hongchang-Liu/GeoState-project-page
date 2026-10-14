@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GeoState · Future geometry comparisons</title>
+  <link rel="stylesheet" href="comparison.css?v=20261011-single-quantitative15">
+</head>
+<body>
+  <main class="comparison" aria-label="Future depth and geometry comparisons">
+    <section class="qualitative" aria-labelledby="qualitative-heading">
+    <div class="section-heading qualitative-heading"><h2 id="qualitative-heading">Qualitative comparison</h2></div>
+    <div class="card">
+      <div class="board-scroll">
+        <div class="board" id="board">
+          <figure class="gt-column">
+            <div class="gt-media"><video id="gt-video" muted loop playsinline preload="auto" aria-label="Ground-truth future RGB video"></video></div>
+            <figcaption>GT video</figcaption>
+          </figure>
+        </div>
+      </div>
+      <div class="timeline">
+        <button id="play" type="button" aria-label="Pause playback" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg></button>
+        <label for="time">Future time</label>
+        <input id="time" type="range" min="0" max="9" step="1" value="0" aria-label="Future time">
+        <output id="time-label" for="time">t + 0.2 s</output>
+      </div>
+      <div class="tools">
+        <span class="instructions">Drag to orbit · Shift-drag to pan · Scroll to zoom</span>
+        <span id="cloud-status" role="status" aria-live="polite"></span>
+        <button id="reset" type="button">Reset view</button>
+      </div>
+    </div>
+    <nav id="scenes" class="scenes" aria-label="Comparison scenes"></nav>
+    </section>
+    <section class="card quantitative" aria-labelledby="quantitative-heading">
+      <div class="section-heading"><h2 id="quantitative-heading">Quantitative comparison</h2><span class="metric-label">AbsRel ↓</span></div>
+      <div id="chart-legend" class="chart-legend" aria-label="Methods"></div>
+      <figure aria-label="Waymo, KITTI and nuScenes quantitative results"><div id="chart-all" class="bar-chart"></div></figure>
+      <div id="chart-data-table" class="sr-only"></div>
+      <p id="chart-error" role="status" hidden>Quantitative results unavailable.</p>
+    </section>
+    <noscript>Enable JavaScript to play the synchronized depth and point-cloud comparisons.</noscript>
+  </main>
+  <script type="module" src="quantitative.js?v=20261011-single-paper15"></script>
+  <script type="module" src="comparison.js?v=20261011-scenes-icons"></script>
+</body>
+</html>

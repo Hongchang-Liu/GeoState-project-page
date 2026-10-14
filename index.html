@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- Primary Meta Tags -->
+  <!-- Paper title and author metadata -->
+  <meta name="title" content="GeoState: Learning View-Decoupled Geometry States for 3D World Modeling - Hongchang Liu, Jian Liu, Yujuan Ding, Liang Peng, Xun Jiang, Fei Ma, Xing Xu, Yi Bin">
+  <meta name="description" content="GeoState decouples scene dynamics from camera motion for predictive 3D world modeling, enabling consistent cross-view querying and zero-shot generalization.">
+  <meta name="keywords" content="3D world modeling, geometry foundation models, view-decoupled representations, scene dynamics, geometric consistency, zero-shot generalization">
+  <!-- Authors, in the supplied order -->
+  <meta name="author" content="Hongchang Liu, Jian Liu, Yujuan Ding, Liang Peng, Xun Jiang, Fei Ma, Xing Xu, Yi Bin">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="GeoState">
+  <meta property="og:title" content="GeoState: Learning View-Decoupled Geometry States for 3D World Modeling">
+  <meta property="og:description" content="GeoState decouples scene dynamics from camera motion for predictive 3D world modeling, enabling consistent cross-view querying and zero-shot generalization.">
+  <!-- TODO: Replace with your actual website URL -->
+  <meta property="og:url" content="https://YOUR_DOMAIN.com/YOUR_PROJECT_PAGE">
+  <!-- TODO: Create a 1200x630px preview image and update path -->
+  <meta property="og:image" content="https://YOUR_DOMAIN.com/static/images/social_preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="GeoState: Learning View-Decoupled Geometry States for 3D World Modeling - Research Preview">
+  <meta property="article:author" content="Hongchang Liu">
+  <meta property="article:section" content="Research">
+  <meta property="article:tag" content="3D world modeling">
+  <meta property="article:tag" content="geometry foundation models">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- TODO: Replace with your lab/institution Twitter handle -->
+  <meta name="twitter:site" content="@YOUR_TWITTER_HANDLE">
+  <!-- TODO: Replace with first author's Twitter handle -->
+  <meta name="twitter:creator" content="@AUTHOR_TWITTER_HANDLE">
+  <meta name="twitter:title" content="GeoState: Learning View-Decoupled Geometry States for 3D World Modeling">
+  <meta name="twitter:description" content="GeoState decouples scene dynamics from camera motion for predictive 3D world modeling, enabling consistent cross-view querying and zero-shot generalization.">
+  <!-- TODO: Same as social preview image above -->
+  <meta name="twitter:image" content="https://YOUR_DOMAIN.com/static/images/social_preview.png">
+  <meta name="twitter:image:alt" content="GeoState: Learning View-Decoupled Geometry States for 3D World Modeling - Research Preview">
+
+  <!-- Academic/Research Specific -->
+  <meta name="citation_title" content="GeoState: Learning View-Decoupled Geometry States for 3D World Modeling">
+  <meta name="citation_author" content="Liu, Hongchang">
+  <meta name="citation_author" content="Liu, Jian">
+  <meta name="citation_author" content="Ding, Yujuan">
+  <meta name="citation_author" content="Peng, Liang">
+  <meta name="citation_author" content="Jiang, Xun">
+  <meta name="citation_author" content="Ma, Fei">
+  <meta name="citation_author" content="Xu, Xing">
+  <meta name="citation_author" content="Bin, Yi">
+  <meta name="citation_pdf_url" content="static/pdfs/geostate.pdf">
+  
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#2563eb">
+  <meta name="msapplication-TileColor" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  
+  <!-- Browser tab title -->
+  <title>GeoState: Learning View-Decoupled Geometry States for 3D World Modeling - Hongchang Liu, Jian Liu, Yujuan Ding, Liang Peng, Xun Jiang, Fei Ma, Xing Xu, Yi Bin</title>
+  
+  <!-- Favicon and App Icons -->
+  <link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48" href="static/images/geostate-favicon.ico?v=20261013">
+  <link rel="icon" type="image/svg+xml" sizes="any" href="static/images/geostate-icon.svg?v=20261013">
+  <link rel="apple-touch-icon" sizes="180x180" href="static/images/geostate-apple-touch-icon.png?v=20261013">
+  
+  <!-- Critical CSS - Load synchronously -->
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css?v=20261013-title-centered">
+  
+  <!-- Local template styles and scripts. -->
+  <link rel="preload" href="static/css/bulma-carousel.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/bulma-slider.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/academicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="static/css/academicons.min.css">
+  </noscript>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script defer src="static/js/bulma-carousel.min.js"></script>
+  <script defer src="static/js/bulma-slider.min.js"></script>
+  <script defer src="static/js/index.js"></script>
+
+  <!-- Structured Data for Academic Papers -->
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ScholarlyArticle",
+  "headline": "GeoState: Learning View-Decoupled Geometry States for 3D World Modeling",
+  "description": "GeoState decouples scene dynamics from camera motion for predictive 3D world modeling, enabling consistent cross-view querying and zero-shot generalization.",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Hongchang Liu",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Tongji University"
+      }
+    },
+    {
+      "@type": "Person",
+      "name": "Jian Liu",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Tongji University"
+      }
+    },
+    {
+      "@type": "Person",
+      "name": "Yujuan Ding",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Hong Kong Polytechnic University"
+      }
+    },
+    {
+      "@type": "Person",
+      "name": "Liang Peng",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Tencent"
+      }
+    },
+    {
+      "@type": "Person",
+      "name": "Xun Jiang",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Tongji University"
+      }
+    },
+    {
+      "@type": "Person",
+      "name": "Fei Ma",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Guangdong Laboratory of Artificial Intelligence and Digital Economy (SZ)"
+      }
+    },
+    {
+      "@type": "Person",
+      "name": "Xing Xu",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Tongji University"
+      }
+    },
+    {
+      "@type": "Person",
+      "name": "Yi Bin",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Tongji University"
+      }
+    }
+  ],
+  "keywords": [
+    "3D world modeling",
+    "geometry foundation models",
+    "view-decoupled representations",
+    "scene dynamics",
+    "geometric consistency",
+    "zero-shot generalization"
+  ],
+  "abstract": "Recent 3D world models increasingly use features from geometry foundation models (GFMs) as predictive world states, benefiting from their rich geometric priors. However, the view dependence of these features entangles scene dynamics with camera-induced variation, making the resulting state evolution harder to predict. We propose GeoState, a view-decoupled geometry representation for predictive 3D world modeling that separates scene-state evolution from camera-dependent observation. Specifically, a scene tokenizer aggregates multi-view GFM features into a view-decoupled scene state, which a geometry decoder queries using camera rays. An autoregressive world model then predicts future scene states, while camera motion is modeled separately. The predicted states can therefore be decoded under either predicted or externally specified cameras, while retaining a single context-derived scale throughout the rollout without per-frame scale alignment. Experiments show that GeoState outperforms prior 3D world models on Waymo, supports geometrically consistent cross-view querying, and generalizes zero-shot to KITTI and nuScenes.",
+  "citation": "@misc{liu_geostate,\n  title={{GeoState}: Learning View-Decoupled Geometry States for {3D} World Modeling},\n  author={Hongchang Liu and Jian Liu and Yujuan Ding and Liang Peng and Xun Jiang and Fei Ma and Xing Xu and Yi Bin}\n}",
+  "isAccessibleForFree": true,
+  "about": [
+    {
+      "@type": "Thing",
+      "name": "3D world modeling"
+    },
+    {
+      "@type": "Thing",
+      "name": "Geometry foundation models"
+    }
+  ]
+}
+  </script>
+  
+  <!-- Author affiliation structured data -->
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "name": "Tongji University"
+    },
+    {
+      "@type": "Organization",
+      "name": "Hong Kong Polytechnic University"
+    },
+    {
+      "@type": "Organization",
+      "name": "Tencent"
+    },
+    {
+      "@type": "Organization",
+      "name": "Guangdong Laboratory of Artificial Intelligence and Digital Economy (SZ)",
+      "alternateName": "Guangming Laboratory"
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <!-- Scroll to Top Button -->
+  <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up" aria-hidden="true"></i>
+  </button>
+
+  <main id="main-content">
+    <!-- Publication header: retain the original Bulma layout. -->
+    <section class="hero">
+      <div class="hero-body">
+        <div class="container">
+          <div class="columns is-centered">
+            <div class="column has-text-centered">
+              <h1 class="title is-1 publication-title"><img class="publication-logo" src="static/images/geostate-icon.svg" width="128" height="128" alt="" aria-hidden="true"><span class="publication-title-text">GeoState: Learning View-Decoupled Geometry States for 3D World Modeling</span></h1>
+              <div class="is-size-5 publication-authors">
+              <span class="author-block"><span class="author-name">Hongchang Liu</span><sup>1</sup>,</span>
+              <span class="author-block"><span class="author-name">Jian Liu</span><sup>1</sup>,</span>
+              <span class="author-block"><span class="author-name">Yujuan Ding</span><sup>2</sup>,</span>
+              <span class="author-block"><span class="author-name">Liang Peng</span><sup>3</sup>,</span>
+              <span class="author-block"><span class="author-name">Xun Jiang</span><sup>1</sup>,</span>
+              <span class="author-block"><span class="author-name">Fei Ma</span><sup>4</sup>,</span>
+              <span class="author-block"><span class="author-name">Xing Xu</span><sup>1</sup>,</span>
+              <span class="author-block"><span class="author-name">Yi Bin</span><sup>1</sup></span>
+            
+        
+              </div>
+              <div class="publication-affiliations">
+              <span class="affiliation-block"><sup>1</sup> <a href="https://tongji.edu.cn/" target="_blank" rel="noopener">Tongji University</a></span>
+              <span class="affiliation-block"><sup>2</sup> <a href="https://polyu.edu.hk/" target="_blank" rel="noopener">Hong Kong Polytechnic University</a></span>
+              <span class="affiliation-block"><sup>3</sup> <a href="https://tencent.com/" target="_blank" rel="noopener">Tencent</a></span>
+              <span class="affiliation-block"><sup>4</sup> <a href="https://gml.ac.cn/" target="_blank" rel="noopener">Guangdong Laboratory of Artificial Intelligence and Digital Economy (SZ), also known as Guangming Laboratory</a></span>
+            
+        
+              </div>
+              <div class="column has-text-centered">
+                <div class="publication-links">
+                  <span class="link-block">
+                    <a href="static/pdfs/geostate.pdf" target="_blank" rel="noopener" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon"><i class="fas fa-file-pdf" aria-hidden="true"></i></span><span>Paper</span>
+                    </a>
+                  </span>
+                  <!-- TODO: Replace these unavailable buttons with links when resources are released. -->
+                  <span class="link-block">
+                    <a class="external-link button is-normal is-rounded is-dark" aria-disabled="true" title="Code coming soon">
+                      <span class="icon"><i class="fab fa-github" aria-hidden="true"></i></span><span>Code</span>
+                    </a>
+                  </span>
+                  <span class="link-block">
+                    <a class="external-link button is-normal is-rounded is-dark" aria-disabled="true" title="arXiv link coming soon">
+                      <span class="icon"><i class="ai ai-arxiv" aria-hidden="true"></i></span><span>arXiv</span>
+                    </a>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Teaser video -->
+    <section class="hero teaser" id="video" aria-label="Project video">
+      <div class="container">
+        <div class="hero-body">
+          <video poster="static/images/geostate-video-poster.jpg?v=20261014" id="tree" autoplay controls muted loop playsinline height="100%" preload="auto">
+            <source src="static/videos/geostate-promo.mp4?v=20261014" type="video/mp4">
+          </video>
+          <h2 class="subtitle has-text-centered">
+            <strong>TL;DR:</strong> GeoState learns a compact, view-decoupled geometry representation from pretrained geometry foundation models, enabling 3D world modeling to predict scene dynamics independently of camera motion.
+          </h2>
+        </div>
+      </div>
+    </section>
+
+    <!-- Abstract: supplied paper text. -->
+    <section class="section hero is-light" id="abstract" aria-labelledby="abstract-heading">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column">
+            <h2 class="title is-3" id="abstract-heading">Abstract</h2>
+            <div class="content has-text-justified"><p>Recent 3D world models increasingly use features from geometry foundation models (GFMs) as predictive world states, benefiting from their rich geometric priors. However, the view dependence of these features entangles scene dynamics with camera-induced variation, making the resulting state evolution harder to predict. We propose GeoState, a view-decoupled geometry representation for predictive 3D world modeling that separates scene-state evolution from camera-dependent observation. Specifically, a scene tokenizer aggregates multi-view GFM features into a view-decoupled scene state, which a geometry decoder queries using camera rays. An autoregressive world model then predicts future scene states, while camera motion is modeled separately. The predicted states can therefore be decoded under either predicted or externally specified cameras, while retaining a single context-derived scale throughout the rollout without per-frame scale alignment. Experiments show that GeoState outperforms prior 3D world models on Waymo, supports geometrically consistent cross-view querying, and generalizes zero-shot to KITTI and nuScenes.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Method Overview: Figure 1 from the supplied paper. -->
+    <section class="hero is-small" id="method-overview" aria-labelledby="method-heading">
+      <div class="hero-body">
+        <div class="container">
+          <h2 class="title is-3 has-text-centered" id="method-heading">Method Overview</h2>
+          <figure class="method-overview-figure">
+            <a href="static/images/method-overview.png?v=20261014" target="_blank" rel="noopener" title="Open the method figure at full size">
+              <img src="static/images/method-overview.png?v=20261014" width="3168" height="1474" alt="GeoState learning and world modeling: scene tokenizer, scene-state prediction, and query-conditioned geometry decoder." loading="lazy" decoding="async">
+            </a>
+          </figure>
+          <div class="content method-overview-description">
+            <p><strong>GeoState Learning:</strong> We train a Scene Tokenizer to transform multi-view VGGT-Ω features into a fixed-size, view-decoupled GeoState <math aria-label="S subscript t"><msub><mi>S</mi><mi>t</mi></msub></math> of shape <strong>512 &times; 512</strong>, and a query-conditioned Geometry Decoder to reconstruct depth maps from arbitrary viewpoints.</p>
+            <p><strong>GeoState World Modeling:</strong> We train an autoregressive World Model to predict future GeoStates from four historical states. The predicted states are then decoded into future depth maps under either predicted or user-specified camera viewpoints.</p>
+            <p>The Scene Tokenizer, Geometry Decoder, and World Model contain 70.46M, 135.55M, and 256.55M parameters, respectively.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Demos: isolated static viewer with a remote GPU decoder. -->
+    <section class="hero is-small is-light" id="interactive-demos" aria-labelledby="demos-heading">
+      <div class="hero-body">
+        <div class="container">
+          <h2 class="title is-3 has-text-centered" id="demos-heading">Interactive Demos</h2>
+          <iframe id="geostate-live-demo" src="static/demo/index.html?v=20261013-no-controls-label" title="GeoState: interactive future geometry and camera exploration" loading="lazy" style="display:block;width:100%;height:1280px;border:0;background:transparent;"></iframe>
+          <script type="module" src="static/demo/embed.js"></script>
+          <noscript><p class="has-text-centered">Enable JavaScript to explore the selected scenes. <a href="static/demo/index.html">Open the interactive viewer</a>.</p></noscript>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparisons: synchronized static forecasts and browser-local point clouds. -->
+    <section class="hero is-small" id="comparisons" aria-labelledby="comparisons-heading">
+      <div class="hero-body">
+        <div class="container">
+          <h2 class="title is-3 has-text-centered" id="comparisons-heading">Comparisons</h2>
+          <iframe id="geostate-comparison" src="static/comparison/index.html?v=20261011-single-quantitative15" title="GeoState: qualitative geometry comparisons and quantitative depth forecasting" loading="lazy" style="display:block;width:100%;height:980px;border:0;background:transparent;"></iframe>
+          <script type="module" src="static/comparison/embed.js"></script>
+          <noscript><p class="has-text-centered">Enable JavaScript to explore the comparisons. <a href="static/comparison/index.html">Open the comparison viewer</a>.</p></noscript>
+        </div>
+      </div>
+    </section>
+
+    <!-- BibTeX citation: retain the original copy button and layout. -->
+    <section class="section" id="BibTeX" aria-labelledby="bibtex-heading">
+      <div class="container is-max-desktop content">
+        <div class="bibtex-header">
+          <h2 class="title has-text-centered" id="bibtex-heading">BibTeX</h2>
+          <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard" type="button"><i class="fas fa-copy" aria-hidden="true"></i><span class="copy-text">Copy</span></button>
+        </div>
+        <pre id="bibtex-code"><code>@misc{liu_geostate,
+  title={{GeoState}: Learning View-Decoupled Geometry States for {3D} World Modeling},
+  author={Hongchang Liu and Jian Liu and Yujuan Ding and Liang Peng and Xun Jiang and Fei Ma and Xing Xu and Yi Bin}
+}</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container"><div class="columns is-centered"><div class="column is-8"><div class="content">
+      <p><strong>Visualization Note.</strong> Point clouds are colored using RGB values from the corresponding video frames for visualization purposes only. Our model only predicts geometry.</p>
+      <p>We thank the authors of the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank" rel="noopener">Academic Project Page Template</a> for the website template, which was adapted from the <a href="https://nerfies.github.io/" target="_blank" rel="noopener">Nerfies</a> project page.</p>
+      <p>This website is licensed under a <a rel="license noopener" href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>.</p>
+    </div></div></div></div>
+  </footer>
+</body>
+</html>

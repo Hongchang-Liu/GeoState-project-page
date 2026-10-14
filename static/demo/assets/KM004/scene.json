@@ -1,0 +1,517 @@
+{
+  "id": "KM004",
+  "dataset": "kitti",
+  "zero_shot": true,
+  "item_id": "2011_09_26/2011_09_26_drive_0059_sync",
+  "split": "train",
+  "anchor": "assets/KM004/anchor.webp",
+  "thumbnail": "assets/KM004/thumb.webp",
+  "frames": [
+    {
+      "seconds": 0.2,
+      "rgb": "assets/KM004/rgb-01.webp",
+      "gt_depth": "assets/KM004/gt-01.webp",
+      "copy_depth": "assets/KM004/copy-01.webp",
+      "fixed_depth": "assets/KM004/fixed-01.webp",
+      "fixed_copy_depth": "assets/KM004/fixed-00.webp",
+      "fixed_pointcloud": "assets/KM004/fixed-cloud-full-v3-01.bin.gz"
+    },
+    {
+      "seconds": 0.4,
+      "rgb": "assets/KM004/rgb-02.webp",
+      "gt_depth": "assets/KM004/gt-02.webp",
+      "copy_depth": "assets/KM004/copy-02.webp",
+      "fixed_depth": "assets/KM004/fixed-02.webp",
+      "fixed_copy_depth": "assets/KM004/fixed-00.webp",
+      "fixed_pointcloud": "assets/KM004/fixed-cloud-full-v3-02.bin.gz"
+    },
+    {
+      "seconds": 0.6,
+      "rgb": "assets/KM004/rgb-03.webp",
+      "gt_depth": "assets/KM004/gt-03.webp",
+      "copy_depth": "assets/KM004/copy-03.webp",
+      "fixed_depth": "assets/KM004/fixed-03.webp",
+      "fixed_copy_depth": "assets/KM004/fixed-00.webp",
+      "fixed_pointcloud": "assets/KM004/fixed-cloud-full-v3-03.bin.gz"
+    },
+    {
+      "seconds": 0.8,
+      "rgb": "assets/KM004/rgb-04.webp",
+      "gt_depth": "assets/KM004/gt-04.webp",
+      "copy_depth": "assets/KM004/copy-04.webp",
+      "fixed_depth": "assets/KM004/fixed-04.webp",
+      "fixed_copy_depth": "assets/KM004/fixed-00.webp",
+      "fixed_pointcloud": "assets/KM004/fixed-cloud-full-v3-04.bin.gz"
+    },
+    {
+      "seconds": 1.0,
+      "rgb": "assets/KM004/rgb-05.webp",
+      "gt_depth": "assets/KM004/gt-05.webp",
+      "copy_depth": "assets/KM004/copy-05.webp",
+      "fixed_depth": "assets/KM004/fixed-05.webp",
+      "fixed_copy_depth": "assets/KM004/fixed-00.webp",
+      "fixed_pointcloud": "assets/KM004/fixed-cloud-full-v3-05.bin.gz"
+    },
+    {
+      "seconds": 1.2,
+      "rgb": "assets/KM004/rgb-06.webp",
+      "gt_depth": "assets/KM004/gt-06.webp",
+      "copy_depth": "assets/KM004/copy-06.webp",
+      "fixed_depth": "assets/KM004/fixed-06.webp",
+      "fixed_copy_depth": "assets/KM004/fixed-00.webp",
+      "fixed_pointcloud": "assets/KM004/fixed-cloud-full-v3-06.bin.gz"
+    },
+    {
+      "seconds": 1.4,
+      "rgb": "assets/KM004/rgb-07.webp",
+      "gt_depth": "assets/KM004/gt-07.webp",
+      "copy_depth": "assets/KM004/copy-07.webp",
+      "fixed_depth": "assets/KM004/fixed-07.webp",
+      "fixed_copy_depth": "assets/KM004/fixed-00.webp",
+      "fixed_pointcloud": "assets/KM004/fixed-cloud-full-v3-07.bin.gz"
+    },
+    {
+      "seconds": 1.6,
+      "rgb": "assets/KM004/rgb-08.webp",
+      "gt_depth": "assets/KM004/gt-08.webp",
+      "copy_depth": "assets/KM004/copy-08.webp",
+      "fixed_depth": "assets/KM004/fixed-08.webp",
+      "fixed_copy_depth": "assets/KM004/fixed-00.webp",
+      "fixed_pointcloud": "assets/KM004/fixed-cloud-full-v3-08.bin.gz"
+    },
+    {
+      "seconds": 1.8,
+      "rgb": "assets/KM004/rgb-09.webp",
+      "gt_depth": "assets/KM004/gt-09.webp",
+      "copy_depth": "assets/KM004/copy-09.webp",
+      "fixed_depth": "assets/KM004/fixed-09.webp",
+      "fixed_copy_depth": "assets/KM004/fixed-00.webp",
+      "fixed_pointcloud": "assets/KM004/fixed-cloud-full-v3-09.bin.gz"
+    },
+    {
+      "seconds": 2.0,
+      "rgb": "assets/KM004/rgb-10.webp",
+      "gt_depth": "assets/KM004/gt-10.webp",
+      "copy_depth": "assets/KM004/copy-10.webp",
+      "fixed_depth": "assets/KM004/fixed-10.webp",
+      "fixed_copy_depth": "assets/KM004/fixed-00.webp",
+      "fixed_pointcloud": "assets/KM004/fixed-cloud-full-v3-10.bin.gz"
+    }
+  ],
+  "depth_bounds_m": [
+    10.292600021362304,
+    70.03740036010743
+  ],
+  "camera_convention": "OpenCV camera-to-world; anchor FRONT, metres",
+  "camera_metadata_ready": true,
+  "history_poses": [
+    [
+      [
+        0.9999999403953552,
+        -2.058976133412216e-05,
+        -0.0004307120980229229,
+        -0.0011980374110862613
+      ],
+      [
+        2.2203576008905657e-05,
+        0.9999929666519165,
+        0.00374689232558012,
+        -0.0403163880109787
+      ],
+      [
+        0.00043063246994279325,
+        -0.0037469016388058662,
+        0.999992847442627,
+        -0.361370712518692
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999998807907104,
+        -3.299702802905813e-05,
+        -0.0005251038819551468,
+        -0.0009087987127713859
+      ],
+      [
+        3.426116381888278e-05,
+        0.9999971389770508,
+        0.0024052434600889683,
+        -0.021173877641558647
+      ],
+      [
+        0.000525022333022207,
+        -0.0024052627850323915,
+        0.9999969601631165,
+        -0.2869742214679718
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999999403953552,
+        0.00014237826690077782,
+        -0.0003927767393179238,
+        -0.0010179451201111078
+      ],
+      [
+        -0.00014205319166649133,
+        0.9999996423721313,
+        0.0008222562028095126,
+        -0.007074370514601469
+      ],
+      [
+        0.00039289434789679945,
+        -0.0008222020114772022,
+        0.9999995231628418,
+        -0.1704494208097458
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        1.0,
+        -1.734723475976807e-18,
+        -7.860465750519907e-19,
+        4.440892098500626e-16
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -1.1102230246251565e-16
+      ],
+      [
+        -2.9002408113987244e-18,
+        3.469446951953614e-18,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  ],
+  "gt_poses": [
+    [
+      [
+        0.9999998807907104,
+        -0.0001359612069791183,
+        0.0005749888368882239,
+        0.00018350845493841916
+      ],
+      [
+        0.0001362543407594785,
+        0.9999998807907104,
+        -0.0005079972906969488,
+        0.012434208765625954
+      ],
+      [
+        -0.0005749211413785815,
+        0.0005080722039565444,
+        0.9999996423721313,
+        0.21792124211788177
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999991059303284,
+        -0.0004110313893761486,
+        0.001309425919316709,
+        0.0017761006020009518
+      ],
+      [
+        0.0004130414454266429,
+        0.9999987483024597,
+        -0.001534540788270533,
+        0.022972378879785538
+      ],
+      [
+        -0.0013087941333651543,
+        0.0015350785106420517,
+        0.9999979734420776,
+        0.5114582180976868
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999966025352478,
+        -0.0007796584977768362,
+        0.0024866426829248667,
+        0.005773210432380438
+      ],
+      [
+        0.0007873467984609306,
+        0.9999948740005493,
+        -0.0030918021220713854,
+        0.026732154190540314
+      ],
+      [
+        -0.00248421891592443,
+        0.003093749051913619,
+        0.9999920725822449,
+        0.8781711459159851
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.999994158744812,
+        -0.00010300528083462268,
+        0.003422402311116457,
+        0.008962253108620644
+      ],
+      [
+        0.00011664490739349276,
+        0.9999920725822449,
+        -0.003985147457569838,
+        0.031599320471286774
+      ],
+      [
+        -0.003421964356675744,
+        0.003985523246228695,
+        0.9999861717224121,
+        1.3044978380203247
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999887347221375,
+        -0.0010644245194271207,
+        0.004638928920030594,
+        0.015397782437503338
+      ],
+      [
+        0.001084938645362854,
+        0.9999896287918091,
+        -0.004421570338308811,
+        0.043802209198474884
+      ],
+      [
+        -0.004634174518287182,
+        0.004426552448421717,
+        0.9999794363975525,
+        1.8345563411712646
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999823570251465,
+        -0.001302044140174985,
+        0.005806310568004847,
+        0.021889308467507362
+      ],
+      [
+        0.0013284723972901702,
+        0.9999887347221375,
+        -0.004549738951027393,
+        0.05967734381556511
+      ],
+      [
+        -0.005800321232527494,
+        0.004557371139526367,
+        0.9999728202819824,
+        2.452401638031006
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999762773513794,
+        -0.0006519147427752614,
+        0.006858582142740488,
+        0.0243193618953228
+      ],
+      [
+        0.0006938278093002737,
+        0.9999811053276062,
+        -0.0061102984473109245,
+        0.07255705446004868
+      ],
+      [
+        -0.0068544684909284115,
+        0.006114911753684282,
+        0.999957799911499,
+        3.1152074337005615
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999640583992004,
+        -0.0018830691697075963,
+        0.008270581252872944,
+        0.035368531942367554
+      ],
+      [
+        0.0019318590639159083,
+        0.9999807476997375,
+        -0.005895007401704788,
+        0.08505212515592575
+      ],
+      [
+        -0.008259321562945843,
+        0.00591077096760273,
+        0.9999483823776245,
+        3.8946404457092285
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999518394470215,
+        -0.0016218876698985696,
+        0.00967833586037159,
+        0.03925922513008118
+      ],
+      [
+        0.0016776931006461382,
+        0.9999819993972778,
+        -0.005760589148849249,
+        0.09124194085597992
+      ],
+      [
+        -0.00966881774365902,
+        0.0057765464298427105,
+        0.9999365210533142,
+        4.755344390869141
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.9999328851699829,
+        -0.002443237230181694,
+        0.011323724873363972,
+        0.04649799317121506
+      ],
+      [
+        0.0025190815795212984,
+        0.9999744296073914,
+        -0.00668827211484313,
+        0.09874092787504196
+      ],
+      [
+        -0.011307093314826488,
+        0.006716347299516201,
+        0.9999135136604309,
+        5.693673610687256
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  ],
+  "history_seconds": [
+    -0.6,
+    -0.4,
+    -0.2,
+    0.0
+  ],
+  "intrinsics": [
+    [
+      692.6762084960938,
+      0.0,
+      349.0169372558594
+    ],
+    [
+      0.0,
+      708.0690307617188,
+      169.6273956298828
+    ],
+    [
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "pointcloud_annotation": "Predicted depth; future GT RGB colors for display only; not predicted RGB.",
+  "anchor_frame": {
+    "seconds": 0.0,
+    "rgb": "assets/KM004/anchor.webp",
+    "gt_depth": "assets/KM004/fixed-00.webp",
+    "copy_depth": "assets/KM004/fixed-00.webp",
+    "fixed_depth": "assets/KM004/fixed-00.webp",
+    "fixed_copy_depth": "assets/KM004/fixed-00.webp",
+    "fixed_pointcloud": "assets/KM004/fixed-cloud-full-v3-00.bin.gz"
+  },
+  "pointcloud_filter": {
+    "version": "sky_connected_full_v3",
+    "raster_stride": 1,
+    "purpose": "Display only; depth predictions, RGB and evaluation masks are unchanged.",
+    "support": "One consistent neighbour in the eight-neighbour raster is sufficient.",
+    "sky_annotation": "Unchanged offline GT RGB sky masks; not a forecast input.",
+    "geometry": "Real samples from original full-resolution depth; no interpolation, smoothing or rescaling.",
+    "visibility": "Prediction-only source z-buffer, never ground-truth depth."
+  }
+}

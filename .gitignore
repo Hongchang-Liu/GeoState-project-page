@@ -1,0 +1,15 @@
+# Local tooling and private runtime data, not static point-cloud assets.
+.DS_Store
+.vscode/
+.idea/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+*.pem
+*.key
+*.pt
+*.pth
+*.ckpt
+checkpoints/
+node_modules/
