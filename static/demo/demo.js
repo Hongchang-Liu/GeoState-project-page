@@ -92,7 +92,7 @@ function scheduleDecode(delay=0){
 }
 function localCloudWorker(){
   if(!cloudWorker){
-    cloudWorker=new Worker(new URL('./pointcloud-worker.js',import.meta.url));
+    cloudWorker=new Worker(new URL('./pointcloud-worker.js?v=20261014-lossless-depth',import.meta.url));
     cloudWorker.onmessage=({data})=>{const job=workerJobs.get(data.id);if(!job)return;workerJobs.delete(data.id);data.error?job.reject(new Error(data.error)):job.resolve(data);};
     cloudWorker.onerror=()=>{for(const job of workerJobs.values())job.reject(new Error('Local point-cloud worker failed'));workerJobs.clear();cloudWorker.terminate();cloudWorker=null;};
   }
@@ -126,7 +126,7 @@ async function readDepthPacket(response,onWorld){
     const metaSize=view.getUint32(4,true),imageSize=view.getUint32(8,true),depthSize=view.getUint32(12,true);
     if(metaSize>65536||imageSize>4000000||depthSize>2000000)throw new Error('Depth response too large');
     const metadata=JSON.parse(new TextDecoder().decode(await readExact(metaSize)));
-    if(metadata.format!=='geostate_depth_v1'||metadata.depth_encoding!=='gzip-float32-le'||metadata.pointcloud_filter!=='sky_connected_full_v3')throw new Error('Unsupported depth format');
+    if(metadata.format!=='geostate_depth_v1'||!['gzip-float32-le','gzip-xor-shuffle-float32-le'].includes(metadata.depth_encoding)||metadata.pointcloud_filter!=='sky_connected_full_v3')throw new Error('Unsupported depth format');
     onWorld(await readExact(imageSize),metadata);
     const depthBuffer=(await readExact(depthSize)).buffer;
     if(position!==pending.length||!(await reader.read()).done)throw new Error('Unexpected depth-response bytes');
@@ -242,7 +242,7 @@ async function decode(){
   const timeout=setTimeout(()=>job.controller.abort(new DOMException('Decode timed out','TimeoutError')),30000);
   try{
     const local=Boolean(globalThis.Worker&&globalThis.OffscreenCanvas&&globalThis.DecompressionStream);
-    const response=await fetch(api+'/api/decode',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...query.params,transport:local?'depth-binary-v1':'json'}),signal:job.controller.signal});
+    const response=await fetch(api+'/api/decode',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...query.params,transport:local?'depth-binary-v2':'json'}),signal:job.controller.signal});
     if(!response.ok)throw new Error(response.status===429?'Decoder busy · retry shortly':`Decoder unavailable (${response.status})`);
     let cloudBuffer,stats,localMs=0;
     if(local){

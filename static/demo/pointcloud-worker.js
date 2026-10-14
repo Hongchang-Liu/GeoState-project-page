@@ -131,7 +131,16 @@ self.onmessage = async event => {
   try {
     if (event.data.kind === 'warm') { await annotations(rgbUrl, skyUrl); return; }
     const inputs = annotations(rgbUrl, skyUrl, metadata.width, metadata.height);
-    const raw = compressed ? await new Response(new Blob([depthBuffer]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer() : depthBuffer;
+    let raw = compressed ? await new Response(new Blob([depthBuffer]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer() : depthBuffer;
+    if (metadata.depth_encoding === 'gzip-xor-shuffle-float32-le') {
+      const count = metadata.width * metadata.height;
+      if (!Number.isInteger(count) || count <= 0 || count > 300000 || raw.byteLength !== count * 4) throw new Error('Invalid lossless depth payload');
+      const planes = new Uint8Array(raw), restored = new Uint8Array(raw.byteLength);
+      for (let i = 0; i < count; i++) for (let byte = 0; byte < 4; byte++) restored[4*i+byte] = planes[byte*count+i];
+      const bits = new Uint32Array(restored.buffer);
+      for (let row = 0; row < count; row += metadata.width) for (let i = row+1; i < row+metadata.width; i++) bits[i] ^= bits[i-1];
+      raw = restored.buffer;
+    } else if (metadata.depth_encoding && metadata.depth_encoding !== 'gzip-float32-le') throw new Error('Unsupported depth encoding');
     const [rgba, sky] = await inputs;
     if (rgba.length !== metadata.width*metadata.height*4 || sky.length !== rgba.length) throw new Error('Annotation dimensions mismatch');
     const preparationMs = performance.now()-started;
