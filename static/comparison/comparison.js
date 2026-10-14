@@ -4,8 +4,10 @@ const video = $('#gt-video');
 const slider = $('#time');
 const status = $('#cloud-status');
 let manifest, scene, sceneVersion = 0, frameIndex = -1, playing = true, interactive = false;
-let camera, panels = [], cloudCache = new Map(), imageCache = [], warmVersion = 0;
-let videoURL = null;
+let camera, panels = [], cloudCache = new Map(), warmVersion = 0;
+let videoURL = null, mediaReady = false;
+const previewCache = new Map(), videoCache = new Map(), mediaQueue = [];
+let mediaActive = 0, mediaPumpScheduled = false;
 const preciseVideoFrames = 'requestVideoFrameCallback' in video;
 const sub = (a, b) => a.map((value, i) => value - b[i]);
 const add = (a, b) => a.map((value, i) => value + b[i]);
@@ -109,10 +111,78 @@ function setPlaying(value) {
   $('#play').setAttribute('aria-label',value?'Pause playback':'Play playback');
   $('#play').setAttribute('aria-pressed',String(value));
   const version=sceneVersion;
-  if(value && video.getAttribute('src')) video.play().catch(error => {
+  if(value && mediaReady && video.getAttribute('src')) video.play().catch(error => {
     if(version===sceneVersion && playing && error.name!=='AbortError') setPlaying(false);
   });
   else video.pause();
+}
+function scheduleMedia() {
+  if(mediaPumpScheduled)return;
+  mediaPumpScheduled=true;
+  queueMicrotask(()=>{mediaPumpScheduled=false;pumpMedia();});
+}
+function pumpMedia() {
+  // Foreground selections outrank queued background work. At most two background
+  // downloads run when no selected-scene assets remain; foreground uses four.
+  mediaQueue.sort((a,b)=>(a.sceneId===scene?.id?0:1)-(b.sceneId===scene?.id?0:1));
+  while(mediaQueue.length && mediaActive < (mediaQueue[0].sceneId===scene?.id?4:2)) {
+    const job=mediaQueue.shift();mediaActive++;
+    job.run().then(job.resolve,job.reject).finally(()=>{mediaActive--;scheduleMedia();});
+  }
+}
+function queueMedia(sceneId, run) {
+  const pending=new Promise((resolve,reject)=>mediaQueue.push({sceneId,run,resolve,reject}));
+  scheduleMedia();return pending;
+}
+function previewAsset(row, url) {
+  if(previewCache.has(url))return previewCache.get(url);
+  const entry={image:null,ready:false,pending:null};
+  entry.pending=queueMedia(row.id,()=>new Promise((resolve,reject)=>{
+    const image=new Image();entry.image=image;image.decoding='async';
+    const timeout=setTimeout(()=>fail(new Error('Preview load timed out')),20000);
+    const fail=error=>{clearTimeout(timeout);image.onload=null;image.onerror=null;reject(error);};
+    image.onerror=()=>fail(new Error('Preview image unavailable'));
+    image.onload=async()=>{
+      try{await image.decode();clearTimeout(timeout);image.onload=null;image.onerror=null;entry.ready=true;resolve(image);}
+      catch(error){fail(error);}
+    };
+    image.src=url;
+  })).catch(error=>{previewCache.delete(url);throw error;});
+  previewCache.set(url,entry);return entry;
+}
+function cachedVideo(row) {
+  if(!videoCache.has(row.video)) {
+    const pending=queueMedia(row.id,async()=>{
+      const response=await fetch(row.video,{signal:AbortSignal.timeout(20000)});
+      if(!response.ok)throw new Error('Video asset unavailable');
+      return response.blob();
+    }).catch(error=>{videoCache.delete(row.video);throw error;});
+    videoCache.set(row.video,pending);
+  }
+  return videoCache.get(row.video);
+}
+function preloadImages(row) {
+  return Promise.all(row.frames.flatMap(frame=>manifest.methods.flatMap(method=>
+    ['depth','preview'].map(kind=>previewAsset(row,frame.methods[method.id][kind]).pending))));
+}
+function warmOtherScenes(version) {
+  const run=()=>{
+    if(version!==sceneVersion)return;
+    for(const row of manifest.scenes)if(row.id!==scene.id) {
+      // Keep all four scenes' decoded previews and small video blobs for instant
+      // revisits. Full interactive point clouds remain demand-loaded.
+      Promise.all([preloadImages(row),cachedVideo(row)]).catch(()=>{});
+    }
+  };
+  if(globalThis.requestIdleCallback)requestIdleCallback(run,{timeout:1000});
+  else setTimeout(run,100);
+}
+function displayPreview(panel, kind, url) {
+  const image=previewCache.get(url);
+  if(image?.ready) {
+    const current=panel[kind];
+    if(current!==image.image){image.image.alt=current.alt;current.replaceWith(image.image);panel[kind]=image.image;}
+  } else panel[kind].src=url;
 }
 async function loadCloud(index, method, version=sceneVersion) {
   const key=`${index}/${method}`;
@@ -154,31 +224,36 @@ function showFrame(index,force=false) {
   frameIndex=index;slider.value=index;
   const frame=scene.frames[index];$('#time-label').textContent=`t + ${frame.seconds.toFixed(1)} s`;
   panels.forEach(panel=>{
-    const assets=frame.methods[panel.method];panel.depth.src=assets.depth;panel.preview.src=assets.preview;
+    const assets=frame.methods[panel.method];displayPreview(panel,'depth',assets.depth);displayPreview(panel,'preview',assets.preview);
     panel.cloud.classList.remove('interactive');
   });
   if(interactive)renderClouds();
 }
-function preloadImages() {
-  imageCache=[];
-  for(const frame of scene.frames)for(const method of manifest.methods) {
-    for(const kind of ['depth','preview']){const image=new Image();image.src=frame.methods[method.id][kind];imageCache.push(image);}
-  }
-}
 function selectScene(row) {
-  sceneVersion++;warmVersion++;scene=row;cloudCache=new Map();interactive=false;camera=initialCamera();frameIndex=-1;status.textContent='';
+  sceneVersion++;warmVersion++;scene=row;cloudCache=new Map();interactive=false;camera=initialCamera();frameIndex=-1;mediaReady=false;status.textContent='Loading previews…';
   panels.forEach(panel=>panel.cloud.classList.remove('interactive'));
   document.querySelectorAll('.scene').forEach(button=>{const active=button.dataset.id===row.id;button.classList.toggle('selected',active);button.setAttribute('aria-pressed',String(active));});
-  showFrame(0,true);video.pause();video.removeAttribute('src');video.poster=row.thumbnail;video.load();preloadImages();
+  video.pause();video.removeAttribute('src');video.poster=row.thumbnail;video.load();
   if(videoURL){URL.revokeObjectURL(videoURL);videoURL=null;}
   const version=sceneVersion;
-  // Blob-backed short videos remain seekable even on static hosts without ranges.
-  fetch(row.video).then(response=>{
-    if(!response.ok)throw new Error('Video asset unavailable');return response.blob();
-  }).then(blob=>{
+  // Show the first frame promptly, but do not advance the media clock until all
+  // ten depth/preview frames have been downloaded and decoded.
+  const firstFrame=Promise.all(manifest.methods.flatMap(method=>
+    ['depth','preview'].map(kind=>previewAsset(row,row.frames[0].methods[method.id][kind]).pending)));
+  firstFrame.then(()=>{if(version===sceneVersion)showFrame(frameIndex<0?0:frameIndex,true);}).catch(()=>{});
+  Promise.all([preloadImages(row),cachedVideo(row)]).then(([,blob])=>{
     if(version!==sceneVersion)return;
-    videoURL=URL.createObjectURL(blob);video.src=videoURL;video.load();if(playing)setPlaying(true);
-  }).catch(error=>{if(version===sceneVersion){status.textContent='Video unavailable';setPlaying(false);}console.error(error);});
+    showFrame(frameIndex<0?0:frameIndex,true);
+    videoURL=URL.createObjectURL(blob);video.src=videoURL;video.load();
+    const start=()=>{
+      if(version!==sceneVersion)return;
+      mediaReady=true;video.currentTime=Math.max(0,frameIndex)*.25;status.textContent='';
+      if(playing)setPlaying(true);
+      warmOtherScenes(version);
+    };
+    if(video.readyState>=1)start();else video.addEventListener('loadedmetadata',start,{once:true});
+  }).catch(error=>{if(version===sceneVersion){status.textContent='Preview assets unavailable';setPlaying(false);}console.error(error);});
+  scheduleMedia();
   setPlaying(true);
 }
 let pointer=null;
@@ -208,16 +283,16 @@ function attachInteraction(panel) {
   },{passive:false});
 }
 $('#play').addEventListener('click',()=>setPlaying(!playing));
-slider.addEventListener('input',()=>{setPlaying(false);const index=Number(slider.value);showFrame(index);video.currentTime=(index+.02)*.25;});
+slider.addEventListener('input',()=>{setPlaying(false);const index=Number(slider.value);showFrame(index);if(mediaReady)video.currentTime=(index+.02)*.25;});
 $('#reset').addEventListener('click',()=>{
   camera=initialCamera();interactive=false;warmVersion++;status.textContent='';panels.forEach(panel=>panel.cloud.classList.remove('interactive'));
 });
 // Do not mix the ahead-of-display media clock with presented-frame callbacks.
-video.addEventListener('timeupdate',()=>{if(scene&&playing&&!preciseVideoFrames)showFrame(Math.min(9,Math.floor((video.currentTime+1e-6)/.25)));});
+video.addEventListener('timeupdate',()=>{if(scene&&mediaReady&&playing&&!preciseVideoFrames)showFrame(Math.min(9,Math.floor((video.currentTime+1e-6)/.25)));});
 video.addEventListener('loadedmetadata',()=>{if(playing)setPlaying(true);});
 video.addEventListener('error',()=>{status.textContent='Video unavailable';setPlaying(false);});
 if(preciseVideoFrames) {
-  const onFrame=(now,metadata)=>{if(scene&&playing)showFrame(Math.min(9,Math.floor((metadata.mediaTime+1e-6)/.25)));video.requestVideoFrameCallback(onFrame);};
+  const onFrame=(now,metadata)=>{if(scene&&mediaReady&&playing)showFrame(Math.min(9,Math.floor((metadata.mediaTime+1e-6)/.25)));video.requestVideoFrameCallback(onFrame);};
   video.requestVideoFrameCallback(onFrame);
 }
 const observer=new ResizeObserver(()=>{
