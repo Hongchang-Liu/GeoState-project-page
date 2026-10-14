@@ -1,4 +1,4 @@
-import {API_BASE, REQUEST_DELAY_MS} from './config.js';
+import {API_BASE, REQUEST_DELAY_MS} from './config.js?v=20261014-tunnel-test';
 
 const $ = id => document.getElementById(id);
 const labels = {waymo:'Waymo',kitti:'KITTI',nuscenes:'nuScenes'};
