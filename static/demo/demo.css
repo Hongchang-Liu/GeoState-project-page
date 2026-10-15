@@ -65,3 +65,5 @@
 @media(max-width:1000px){.main-grid .panel-heading{min-height:72px}.pointmap-tools{flex-wrap:wrap}.pointmap-guide{width:100%}}
 @media(min-width:681px) and (max-width:1000px){.dashboard .pose-readouts{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px 4px;padding:6px}.dashboard .pose-readouts>div{font-size:8px}.dashboard #reset{font-size:8px;padding:4px}}
 @media(max-width:680px){.main-grid .panel-heading{min-height:55px}.world-panel .keyboard-guide{max-width:230px}.pointmap-tools{flex-wrap:nowrap}.pointmap-guide{width:auto}.dashboard .depth-key{margin-top:3px}}
+/* Keep desktop instructions together without reducing their enlarged text. */
+@media(min-width:1001px){.world-panel .keyboard-guide{max-width:none;flex-shrink:0}.world-panel .keyboard-guide p{flex-wrap:nowrap;gap:6px}.world-panel .keyboard-guide kbd{padding:0 2px;margin:0 1px}.pointmap-guide{flex-wrap:nowrap}.main-grid .panel-heading{flex-wrap:wrap;row-gap:2px}}
