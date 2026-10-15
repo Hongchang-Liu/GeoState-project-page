@@ -9,6 +9,14 @@ const cloudCache = new Map();
 let videoURL = null, mediaReady = false;
 const previewCache = new Map(), videoCache = new Map(), mediaQueue = [];
 let mediaActive = 0, mediaPumpScheduled = false, priorityTicket = 0;
+let liveDecoderBusy=false,decoderLease=null;
+window.addEventListener('message',event=>{
+  if(window.parent===window||event.origin!==location.origin||event.source!==window.parent||event.data?.type!=='geostate-comparison-download-priority'||typeof event.data.busy!=='boolean')return;
+  liveDecoderBusy=event.data.busy;clearTimeout(decoderLease);
+  if(liveDecoderBusy)decoderLease=setTimeout(()=>{liveDecoderBusy=false;scheduleMedia();},45000);
+  scheduleMedia();
+});
+if(window.parent!==window)window.parent.postMessage({type:'geostate-comparison-priority-ready'},location.origin);
 const preciseVideoFrames = 'requestVideoFrameCallback' in video;
 const sub = (a, b) => a.map((value, i) => value - b[i]);
 const add = (a, b) => a.map((value, i) => value + b[i]);
@@ -133,6 +141,9 @@ function pumpMedia() {
   // competing queue for point-cloud downloads.
   mediaQueue.sort((a,b)=>assetPriority(a)-assetPriority(b) || (assetPriority(a)===0?b.ticket-a.ticket:0));
   while(mediaQueue.length && mediaActive<6) {
+    // Let in-flight transfers finish. Only new bulk/background work waits;
+    // selected previews and explicitly requested comparison views still work.
+    if(liveDecoderBusy&&assetPriority(mediaQueue[0])>1)break;
     if(assetPriority(mediaQueue[0])>1 && mediaActive>=2)break;
     const job=mediaQueue.shift();job.state='active';mediaActive++;
     Promise.resolve().then(job.run).then(value=>{

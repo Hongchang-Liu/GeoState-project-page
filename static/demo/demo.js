@@ -13,6 +13,7 @@ const TIME_REQUEST_DELAY_MS=60,PREFETCH_IDLE_MS=600,PREFETCH_GAP_MS=400;
 const PLAY_INTERVAL_MS=450;
 let cacheBytes=0,activeJob=null,foregroundDue=0,warmDue=Infinity,lastPrefetchStart=0;
 let activeView='',failedCurrent='',prefetchSkipped=new Set();
+let prioritySequence=0;
 const STATIC_CLOUD_BYTES=64*1024*1024,STATIC_CLOUD_ENTRIES=22;
 const GEOMETRY_LAYER_BYTES=64*1024*1024,GEOMETRY_LAYER_ENTRIES=22;
 const geometryLayers=new Map(),geometryJobs=new Map();
@@ -27,6 +28,21 @@ if (api) {
 }
 
 function status(message,kind='',detail=message){ $('status').textContent=message; $('status').title=detail; $('status').className=`status ${kind}`; }
+function announceDecodePriority(job,busy){
+  if(window.parent!==window)window.parent.postMessage({
+    type:'geostate-demo-decode-activity',busy,requestId:job.priorityId,
+  },location.origin);
+}
+function announceDecodeState(){
+  if(window.parent===window)return;
+  if(activeJob)announceDecodePriority(activeJob,true);
+  else window.parent.postMessage({type:'geostate-demo-decode-idle'},location.origin);
+}
+window.addEventListener('message',event=>{
+  if(event.origin===location.origin&&event.source===window.parent&&event.data?.type==='geostate-demo-priority-query')announceDecodeState();
+});
+window.addEventListener('pagehide',()=>{if(activeJob)announceDecodePriority(activeJob,false);});
+announceDecodeState();
 function errorStatus(error){
   const detail=error.message||String(error);
   const label=error.name==='TimeoutError'?'Timed out':/busy/i.test(detail)?'Busy · retry':/scene|manifest/i.test(detail)?'Scene unavailable':/point.cloud|geometry/i.test(detail)?'Geometry unavailable':'Decoder error';
@@ -238,7 +254,8 @@ async function decode(){
     if(!query)return;
     background=true;lastPrefetchStart=now;
   }
-  const job={query,background,cancelled:false,controller:new AbortController(),started:performance.now()};activeJob=job;
+  const job={query,background,cancelled:false,controller:new AbortController(),started:performance.now(),priorityId:`${Date.now()}-${++prioritySequence}`};activeJob=job;
+  announceDecodePriority(job,true);
   const timeout=setTimeout(()=>job.controller.abort(new DOMException('Decode timed out','TimeoutError')),30000);
   try{
     const local=Boolean(globalThis.Worker&&globalThis.OffscreenCanvas&&globalThis.DecompressionStream);
@@ -275,6 +292,7 @@ async function decode(){
       if(isCurrent(query)){failedCurrent=query.key;$('camera-map').dataset.cloudStatus='error';errorStatus(error);}
     }
   }finally{
+    announceDecodePriority(job,false);
     clearTimeout(timeout);activeJob=null;
     if(isCurrent(query)&&diagram.previewFit){diagram.endQueryPreview();diagram.draw(false);}
     if(visible)scheduleDecode();
