@@ -142,8 +142,9 @@ function pumpMedia() {
   mediaQueue.sort((a,b)=>assetPriority(a)-assetPriority(b) || (assetPriority(a)===0?b.ticket-a.ticket:0));
   while(mediaQueue.length && mediaActive<6) {
     // Let in-flight transfers finish. Only new bulk/background work waits;
-    // selected previews and explicitly requested comparison views still work.
-    if(liveDecoderBusy&&assetPriority(mediaQueue[0])>1)break;
+    // explicitly requested comparison views still work. Automatic previews
+    // also yield bandwidth during the initial page load.
+    if(liveDecoderBusy&&assetPriority(mediaQueue[0])>0)break;
     if(assetPriority(mediaQueue[0])>1 && mediaActive>=2)break;
     const job=mediaQueue.shift();job.state='active';mediaActive++;
     Promise.resolve().then(job.run).then(value=>{
@@ -198,7 +199,7 @@ function previewAsset(row,url,urgent=false) {
   if(urgent)entry.job.promote();
   previewCache.set(url,entry);return entry;
 }
-function cachedVideo(row) {
+function cachedVideo(row,urgent=false) {
   if(!videoCache.has(row.video)) {
     const job=queueAsset(row,'video',async()=>{
       const response=await fetch(row.video,{signal:AbortSignal.timeout(25000)});
@@ -207,13 +208,16 @@ function cachedVideo(row) {
       });
       return response.blob();
     });
-    videoCache.set(row.video,job.pending.catch(error=>{videoCache.delete(row.video);throw error;}));
+    videoCache.set(row.video,{job,pending:job.pending.catch(error=>{videoCache.delete(row.video);throw error;})});
   }
-  return videoCache.get(row.video);
+  const entry=videoCache.get(row.video);if(urgent)entry.job.promote();return entry.pending;
 }
-function preloadImages(row) {
+function preloadImages(row,urgent=false) {
   return Promise.all(row.frames.flatMap(frame=>manifest.methods.flatMap(method=>
-    ['depth','preview'].map(kind=>previewAsset(row,frame.methods[method.id][kind]).pending))));
+    ['depth','preview'].map(kind=>previewAsset(row,frame.methods[method.id][kind],urgent).pending))));
+}
+function prioritizeSelectedMedia(){
+  Promise.all([preloadImages(scene,true),cachedVideo(scene,true)]).catch(()=>{});
 }
 function preloadEverything() {
   for(const row of manifest.scenes) {
@@ -273,19 +277,20 @@ function showFrame(index,force=false) {
   });
   if(interactive)renderClouds();
 }
-function selectScene(row) {
+function selectScene(row,userInitiated=false) {
   sceneVersion++;scene=row;interactive=false;camera=initialCamera();frameIndex=-1;mediaReady=false;status.textContent='Loading previews…';
   panels.forEach(panel=>panel.cloud.classList.remove('interactive'));
   document.querySelectorAll('.scene').forEach(button=>{const active=button.dataset.id===row.id;button.classList.toggle('selected',active);button.setAttribute('aria-pressed',String(active));});
   video.pause();video.removeAttribute('src');video.poster=row.thumbnail;video.load();
   if(videoURL){URL.revokeObjectURL(videoURL);videoURL=null;}
   const version=sceneVersion;
+  const selectedMedia=Promise.all([preloadImages(row,userInitiated),cachedVideo(row,userInitiated)]);
   // Show the first frame promptly, but do not advance the media clock until all
   // ten depth/preview frames have been downloaded and decoded.
   const firstFrame=Promise.all(manifest.methods.flatMap(method=>
     ['depth','preview'].map(kind=>previewAsset(row,row.frames[0].methods[method.id][kind],true).pending)));
   firstFrame.then(()=>{if(version===sceneVersion)showFrame(frameIndex<0?0:frameIndex,true);}).catch(()=>{});
-  Promise.all([preloadImages(row),cachedVideo(row)]).then(([,blob])=>{
+  selectedMedia.then(([,blob])=>{
     if(version!==sceneVersion)return;
     showFrame(frameIndex<0?0:frameIndex,true);
     videoURL=URL.createObjectURL(blob);video.src=videoURL;video.load();
@@ -325,8 +330,8 @@ function attachInteraction(panel) {
     else panels.forEach(p=>{if(p.cloud.classList.contains('interactive'))p.renderer.draw();});
   },{passive:false});
 }
-$('#play').addEventListener('click',()=>setPlaying(!playing));
-slider.addEventListener('input',()=>{setPlaying(false);const index=Number(slider.value);showFrame(index);if(mediaReady)video.currentTime=(index+.02)*.25;});
+$('#play').addEventListener('click',()=>{if(!playing&&!mediaReady)prioritizeSelectedMedia();setPlaying(!playing);});
+slider.addEventListener('input',()=>{setPlaying(false);if(!mediaReady)prioritizeSelectedMedia();const index=Number(slider.value);showFrame(index);if(mediaReady)video.currentTime=(index+.02)*.25;});
 $('#reset').addEventListener('click',()=>{
   camera=initialCamera();interactive=false;status.textContent='';panels.forEach(panel=>panel.cloud.classList.remove('interactive'));
 });
@@ -358,7 +363,7 @@ try {
     const button=document.createElement('button');button.type='button';button.className='scene';button.dataset.id=row.id;button.setAttribute('aria-label',`Scene ${index+1}`);
     const image=new Image();image.src=row.thumbnail;image.alt='';const caption=document.createElement('div');caption.className='caption';
     const label=document.createElement('strong');label.textContent=`Scene ${index+1}`;caption.append(label);button.append(image,caption);
-    button.addEventListener('click',()=>selectScene(row));$('#scenes').append(button);
+    button.addEventListener('click',()=>selectScene(row,true));$('#scenes').append(button);
   }
   selectScene(manifest.scenes[0]);
   window.addEventListener('online',preloadEverything);
