@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>GeoState · Future geometry comparisons</title>
-  <link rel="stylesheet" href="comparison.css?v=20261011-single-quantitative15">
+  <link rel="stylesheet" href="comparison.css?v=20261015-playing-status-card">
 </head>
 <body>
   <main class="comparison" aria-label="Future depth and geometry comparisons">
     <section class="qualitative" aria-labelledby="qualitative-heading">
-    <div class="section-heading qualitative-heading"><h2 id="qualitative-heading">Qualitative comparison</h2></div>
     <div class="card">
+      <div class="section-heading qualitative-heading"><h2 id="qualitative-heading">Qualitative comparison</h2></div>
       <div class="board-scroll">
         <div class="board" id="board">
           <figure class="gt-column">
@@ -27,7 +27,7 @@
       </div>
       <div class="tools">
         <span class="instructions">Drag to orbit · Shift-drag to pan · Scroll to zoom</span>
-        <span id="cloud-status" role="status" aria-live="polite"></span>
+        <span id="cloud-status" class="load-status" role="status" aria-live="polite" aria-atomic="true"></span>
         <button id="reset" type="button">Reset view</button>
       </div>
     </div>
@@ -43,6 +43,6 @@
     <noscript>Enable JavaScript to play the synchronized depth and point-cloud comparisons.</noscript>
   </main>
   <script type="module" src="quantitative.js?v=20261011-single-paper15"></script>
-  <script type="module" src="comparison.js?v=20261015-full-preload"></script>
+  <script type="module" src="comparison.js?v=20261015-playing-status-card"></script>
 </body>
 </html>

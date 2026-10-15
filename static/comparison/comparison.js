@@ -293,7 +293,7 @@ function attachInteraction(panel) {
   panel.cloud.addEventListener('contextmenu',event=>event.preventDefault());
   panel.cloud.addEventListener('pointerdown',event=>{
     if(event.button!==0&&event.button!==2)return;
-    event.preventDefault();setPlaying(false);
+    event.preventDefault();
     pointer={id:event.pointerId,x:event.clientX,y:event.clientY,pan:event.shiftKey||event.button===2};
     panel.cloud.setPointerCapture(event.pointerId);
     if(!interactive){interactive=true;status.textContent='Loading point clouds…';renderClouds();}
@@ -309,7 +309,7 @@ function attachInteraction(panel) {
   const release=event=>{if(pointer?.id===event.pointerId)pointer=null;};
   panel.cloud.addEventListener('pointerup',release);panel.cloud.addEventListener('pointercancel',release);
   panel.cloud.addEventListener('wheel',event=>{
-    event.preventDefault();setPlaying(false);camera.radius=Math.max(2,Math.min(300,camera.radius*Math.exp(event.deltaY*.001)));
+    event.preventDefault();camera.radius=Math.max(2,Math.min(300,camera.radius*Math.exp(event.deltaY*.001)));
     if(!interactive){interactive=true;status.textContent='Loading point clouds…';renderClouds();}
     else panels.forEach(p=>{if(p.cloud.classList.contains('interactive'))p.renderer.draw();});
   },{passive:false});
