@@ -50,11 +50,12 @@
 .world-panel .keyboard-guide{margin-left:auto;text-align:right;min-width:0;max-width:440px}
 .world-panel .keyboard-guide strong{font-size:10px;color:var(--muted);font-weight:500}
 .world-panel .keyboard-guide p{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:2px 8px;margin:2px 0 0}
-.world-panel .keyboard-guide p>span{white-space:nowrap;font-size:9px}
+.world-panel .keyboard-guide p>span{white-space:nowrap;font-size:11px}
+.world-panel .keyboard-guide kbd{font-size:11px}
 .pointmap-tools{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0;margin-left:auto}
 .pointmap-tools button{flex-shrink:0}
 .pointmap-guide{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:2px 5px;line-height:1.5}
-.pointmap-guide>span{font-size:9px;white-space:nowrap}
+.pointmap-guide>span{font-size:11px;white-space:nowrap}
 .pointmap-guide>span+span::before{content:'·';margin-right:5px}
 .dashboard-content{grid-template-columns:minmax(0,1fr);min-width:0}
 .dashboard .depth-key{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-width:0;width:100%;gap:5px 8px;margin-top:5px;padding-top:10px;border-top:1px solid var(--border);font-size:9px}

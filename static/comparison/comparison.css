@@ -40,3 +40,5 @@
 @media(max-width:680px){.quantitative{padding:15px 10px 13px;margin-top:24px}.section-heading{gap:8px}.section-heading h2{font-size:15px}.metric-label{font-size:10px;margin-right:1px}.chart-legend{display:grid;grid-template-columns:auto auto;justify-content:center;gap:7px 20px;font-size:11px;margin-bottom:11px}.horizon-label{font-size:10px}.timeline #play{min-width:32px;width:32px;height:28px}}
 @media(prefers-reduced-motion:reduce){.chart-bar{transition:none}}
 @media(max-width:680px){.qualitative>.card{padding:15px 10px 13px}.tools .load-status:not(:empty){order:3;flex-basis:100%}}
+.tools .instructions{font-size:12px}
+@media(max-width:680px){.tools .instructions{font-size:11px}}
