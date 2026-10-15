@@ -4,10 +4,11 @@ const video = $('#gt-video');
 const slider = $('#time');
 const status = $('#cloud-status');
 let manifest, scene, sceneVersion = 0, frameIndex = -1, playing = true, interactive = false;
-let camera, panels = [], cloudCache = new Map(), warmVersion = 0;
+let camera, panels = [];
+const cloudCache = new Map();
 let videoURL = null, mediaReady = false;
 const previewCache = new Map(), videoCache = new Map(), mediaQueue = [];
-let mediaActive = 0, mediaPumpScheduled = false;
+let mediaActive = 0, mediaPumpScheduled = false, priorityTicket = 0;
 const preciseVideoFrames = 'requestVideoFrameCallback' in video;
 const sub = (a, b) => a.map((value, i) => value - b[i]);
 const add = (a, b) => a.map((value, i) => value + b[i]);
@@ -121,43 +122,81 @@ function scheduleMedia() {
   mediaPumpScheduled=true;
   queueMicrotask(()=>{mediaPumpScheduled=false;pumpMedia();});
 }
+function assetPriority(job) {
+  if(job.urgent && job.sceneId===scene?.id)return 0;
+  if(job.sceneId===scene?.id)return job.kind==='cloud'?2:1;
+  return job.kind==='cloud'?4:3;
+}
 function pumpMedia() {
-  // Foreground selections outrank queued background work. At most two background
-  // downloads run when no selected-scene assets remain; foreground uses four.
-  mediaQueue.sort((a,b)=>(a.sceneId===scene?.id?0:1)-(b.sceneId===scene?.id?0:1));
-  while(mediaQueue.length && mediaActive < (mediaQueue[0].sceneId===scene?.id?4:2)) {
-    const job=mediaQueue.shift();mediaActive++;
-    job.run().then(job.resolve,job.reject).finally(()=>{mediaActive--;scheduleMedia();});
+  // Background work leaves four network slots available for user requests.
+  // Recompute priorities after every scene change instead of starting a second
+  // competing queue for point-cloud downloads.
+  mediaQueue.sort((a,b)=>assetPriority(a)-assetPriority(b) || (assetPriority(a)===0?b.ticket-a.ticket:0));
+  while(mediaQueue.length && mediaActive<6) {
+    if(assetPriority(mediaQueue[0])>1 && mediaActive>=2)break;
+    const job=mediaQueue.shift();job.state='active';mediaActive++;
+    Promise.resolve().then(job.run).then(value=>{
+      job.state='ready';job.resolve(value);
+    },error=>{
+      if(error.retryable!==false) {
+        job.attempts++;
+        job.state='retry';
+        job.timer=setTimeout(()=>{
+          job.state='queued';mediaQueue.push(job);scheduleMedia();
+        },Math.min(30000,1000*2**Math.min(5,job.attempts-1)));
+      } else {job.state='failed';job.reject(error);}
+    }).finally(()=>{mediaActive--;scheduleMedia();});
   }
 }
-function queueMedia(sceneId, run) {
-  const pending=new Promise((resolve,reject)=>mediaQueue.push({sceneId,run,resolve,reject}));
-  scheduleMedia();return pending;
+function queueAsset(row,kind,run) {
+  const job={sceneId:row.id,kind,run,state:'queued',attempts:0,urgent:false,timer:null};
+  job.pending=new Promise((resolve,reject)=>{job.resolve=resolve;job.reject=reject;});
+  job.promote=()=>{
+    job.urgent=true;job.ticket=++priorityTicket;
+    if(job.state==='retry') {
+      clearTimeout(job.timer);job.state='queued';mediaQueue.push(job);
+    }
+    scheduleMedia();
+  };
+  mediaQueue.push(job);scheduleMedia();return job;
 }
-function previewAsset(row, url) {
-  if(previewCache.has(url))return previewCache.get(url);
-  const entry={image:null,ready:false,pending:null};
-  entry.pending=queueMedia(row.id,()=>new Promise((resolve,reject)=>{
+function previewAsset(row,url,urgent=false) {
+  if(previewCache.has(url)) {
+    const entry=previewCache.get(url);if(urgent)entry.job.promote();return entry;
+  }
+  const entry={image:null,ready:false,pending:null,job:null};
+  entry.job=queueAsset(row,'preview',()=>new Promise((resolve,reject)=>{
     const image=new Image();entry.image=image;image.decoding='async';
-    const timeout=setTimeout(()=>fail(new Error('Preview load timed out')),20000);
-    const fail=error=>{clearTimeout(timeout);image.onload=null;image.onerror=null;reject(error);};
+    let settled=false;
+    const timeout=setTimeout(()=>fail(new Error('Preview load timed out')),25000);
+    const fail=error=>{
+      if(settled)return;settled=true;clearTimeout(timeout);
+      image.onload=null;image.onerror=null;image.removeAttribute('src');reject(error);
+    };
     image.onerror=()=>fail(new Error('Preview image unavailable'));
     image.onload=async()=>{
-      try{await image.decode();clearTimeout(timeout);image.onload=null;image.onerror=null;entry.ready=true;resolve(image);}
-      catch(error){fail(error);}
+      try {
+        await image.decode();if(settled)return;settled=true;
+        clearTimeout(timeout);image.onload=null;image.onerror=null;
+        entry.ready=true;resolve(image);
+      } catch(error){fail(error);}
     };
     image.src=url;
-  })).catch(error=>{previewCache.delete(url);throw error;});
+  }));
+  entry.pending=entry.job.pending.catch(error=>{previewCache.delete(url);throw error;});
+  if(urgent)entry.job.promote();
   previewCache.set(url,entry);return entry;
 }
 function cachedVideo(row) {
   if(!videoCache.has(row.video)) {
-    const pending=queueMedia(row.id,async()=>{
-      const response=await fetch(row.video,{signal:AbortSignal.timeout(20000)});
-      if(!response.ok)throw new Error('Video asset unavailable');
+    const job=queueAsset(row,'video',async()=>{
+      const response=await fetch(row.video,{signal:AbortSignal.timeout(25000)});
+      if(!response.ok)throw Object.assign(new Error(`Video: HTTP ${response.status}`),{
+        retryable:response.status>=500 || [408,425,429].includes(response.status),
+      });
       return response.blob();
-    }).catch(error=>{videoCache.delete(row.video);throw error;});
-    videoCache.set(row.video,pending);
+    });
+    videoCache.set(row.video,job.pending.catch(error=>{videoCache.delete(row.video);throw error;}));
   }
   return videoCache.get(row.video);
 }
@@ -165,54 +204,52 @@ function preloadImages(row) {
   return Promise.all(row.frames.flatMap(frame=>manifest.methods.flatMap(method=>
     ['depth','preview'].map(kind=>previewAsset(row,frame.methods[method.id][kind]).pending))));
 }
-function warmOtherScenes(version) {
-  if(version!==sceneVersion)return;
-  for(const row of manifest.scenes)if(row.id!==scene.id) {
-    // Queue all previews at startup. The scheduler still prioritizes the
-    // selected scene and limits background transfers to two at a time.
-    Promise.all([preloadImages(row),cachedVideo(row)]).catch(()=>{});
+function preloadEverything() {
+  for(const row of manifest.scenes) {
+    // Every asset is queued at page startup, even if its scene is never opened.
+    // Resolved buffers stay available across scene changes and Reset view.
+    Promise.all([preloadImages(row),cachedVideo(row),...row.frames.flatMap((frame,index)=>
+      manifest.methods.map(method=>loadCloud(row,index,method.id)))]).catch(error=>console.warn('Comparison preload:',error));
   }
 }
-function displayPreview(panel, kind, url) {
-  const image=previewCache.get(url);
-  if(image?.ready) {
+function displayPreview(panel,kind,url) {
+  panel[`${kind}URL`]=url;
+  const entry=previewAsset(scene,url,true);
+  const display=()=>{
+    if(panel[`${kind}URL`]!==url)return;
     const current=panel[kind];
-    if(current!==image.image){image.image.alt=current.alt;current.replaceWith(image.image);panel[kind]=image.image;}
-  } else panel[kind].src=url;
+    if(current!==entry.image){entry.image.alt=current.alt;current.replaceWith(entry.image);panel[kind]=entry.image;}
+  };
+  if(entry.ready)display();else entry.pending.then(display).catch(()=>{});
 }
-async function loadCloud(index, method, version=sceneVersion) {
-  const key=`${index}/${method}`;
-  if(cloudCache.has(key)) return cloudCache.get(key);
-  const url=scene.frames[index].methods[method].cloud;
-  const promise=(async()=>{
-    const response=await fetch(url);
-    if(!response.ok) throw new Error(`Point cloud: HTTP ${response.status}`);
+function loadCloud(row,index,method,urgent=false) {
+  const url=row.frames[index].methods[method].cloud;
+  if(cloudCache.has(url)) {
+    const entry=cloudCache.get(url);if(urgent)entry.job.promote();return entry.pending;
+  }
+  const job=queueAsset(row,'cloud',async()=>{
+    const response=await fetch(url,{signal:AbortSignal.timeout(30000)});
+    if(!response.ok)throw Object.assign(new Error(`Point cloud: HTTP ${response.status}`),{
+      retryable:response.status>=500 || [408,425,429].includes(response.status),
+    });
     const buffer=await new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
     const data=new DataView(buffer);
-    if(new TextDecoder().decode(new Uint8Array(buffer,0,4))!=='GPC2'||buffer.byteLength!==8+data.getUint32(4,true)*16) throw new Error('Invalid point-cloud asset');
+    if(new TextDecoder().decode(new Uint8Array(buffer,0,4))!=='GPC2'||buffer.byteLength!==8+data.getUint32(4,true)*16)
+      throw Object.assign(new Error('Invalid point-cloud asset'),{retryable:false});
     return buffer;
-  })();
-  cloudCache.set(key,promise);
-  try{return await promise;}catch(error){if(version===sceneVersion)cloudCache.delete(key);throw error;}
+  });
+  const entry={job,pending:job.pending.catch(error=>{cloudCache.delete(url);throw error;})};
+  if(urgent)job.promote();cloudCache.set(url,entry);return entry.pending;
 }
 async function renderClouds() {
   const version=sceneVersion,index=frameIndex;
   if(!interactive||index<0)return;
-  const ready=await Promise.all(panels.map(panel=>loadCloud(index,panel.method,version))).catch(error=>{
+  const ready=await Promise.all(panels.map(panel=>loadCloud(scene,index,panel.method,true))).catch(error=>{
     if(version===sceneVersion)status.textContent='Point clouds unavailable';console.error(error);return null;
   });
   if(!ready||version!==sceneVersion||index!==frameIndex||!interactive)return;
   panels.forEach((panel,i)=>{panel.renderer.set(ready[i]);panel.renderer.draw();panel.cloud.classList.add('interactive');});
   status.textContent='';
-}
-async function warmClouds() {
-  const version=sceneVersion, generation=++warmVersion;
-  // One future frame at a time bounds network concurrency and memory.
-  for(let step=1;step<=10;step++) {
-    if(version!==sceneVersion||generation!==warmVersion||!interactive)return;
-    const index=(frameIndex+step)%10;
-    await Promise.all(panels.map(panel=>loadCloud(index,panel.method,version))).catch(()=>{});
-  }
 }
 function showFrame(index,force=false) {
   index=Math.max(0,Math.min(9,index));
@@ -226,7 +263,7 @@ function showFrame(index,force=false) {
   if(interactive)renderClouds();
 }
 function selectScene(row) {
-  sceneVersion++;warmVersion++;scene=row;cloudCache=new Map();interactive=false;camera=initialCamera();frameIndex=-1;mediaReady=false;status.textContent='Loading previews…';
+  sceneVersion++;scene=row;interactive=false;camera=initialCamera();frameIndex=-1;mediaReady=false;status.textContent='Loading previews…';
   panels.forEach(panel=>panel.cloud.classList.remove('interactive'));
   document.querySelectorAll('.scene').forEach(button=>{const active=button.dataset.id===row.id;button.classList.toggle('selected',active);button.setAttribute('aria-pressed',String(active));});
   video.pause();video.removeAttribute('src');video.poster=row.thumbnail;video.load();
@@ -235,7 +272,7 @@ function selectScene(row) {
   // Show the first frame promptly, but do not advance the media clock until all
   // ten depth/preview frames have been downloaded and decoded.
   const firstFrame=Promise.all(manifest.methods.flatMap(method=>
-    ['depth','preview'].map(kind=>previewAsset(row,row.frames[0].methods[method.id][kind]).pending)));
+    ['depth','preview'].map(kind=>previewAsset(row,row.frames[0].methods[method.id][kind],true).pending)));
   firstFrame.then(()=>{if(version===sceneVersion)showFrame(frameIndex<0?0:frameIndex,true);}).catch(()=>{});
   Promise.all([preloadImages(row),cachedVideo(row)]).then(([,blob])=>{
     if(version!==sceneVersion)return;
@@ -248,7 +285,7 @@ function selectScene(row) {
     };
     if(video.readyState>=1)start();else video.addEventListener('loadedmetadata',start,{once:true});
   }).catch(error=>{if(version===sceneVersion){status.textContent='Preview assets unavailable';setPlaying(false);}console.error(error);});
-  warmOtherScenes(version);scheduleMedia();
+  preloadEverything();scheduleMedia();
   setPlaying(true);
 }
 let pointer=null;
@@ -259,7 +296,7 @@ function attachInteraction(panel) {
     event.preventDefault();setPlaying(false);
     pointer={id:event.pointerId,x:event.clientX,y:event.clientY,pan:event.shiftKey||event.button===2};
     panel.cloud.setPointerCapture(event.pointerId);
-    if(!interactive){interactive=true;status.textContent='Loading point clouds…';renderClouds().then(warmClouds);}
+    if(!interactive){interactive=true;status.textContent='Loading point clouds…';renderClouds();}
   });
   panel.cloud.addEventListener('pointermove',event=>{
     if(!pointer||pointer.id!==event.pointerId)return;
@@ -273,14 +310,14 @@ function attachInteraction(panel) {
   panel.cloud.addEventListener('pointerup',release);panel.cloud.addEventListener('pointercancel',release);
   panel.cloud.addEventListener('wheel',event=>{
     event.preventDefault();setPlaying(false);camera.radius=Math.max(2,Math.min(300,camera.radius*Math.exp(event.deltaY*.001)));
-    if(!interactive){interactive=true;status.textContent='Loading point clouds…';renderClouds().then(warmClouds);}
+    if(!interactive){interactive=true;status.textContent='Loading point clouds…';renderClouds();}
     else panels.forEach(p=>{if(p.cloud.classList.contains('interactive'))p.renderer.draw();});
   },{passive:false});
 }
 $('#play').addEventListener('click',()=>setPlaying(!playing));
 slider.addEventListener('input',()=>{setPlaying(false);const index=Number(slider.value);showFrame(index);if(mediaReady)video.currentTime=(index+.02)*.25;});
 $('#reset').addEventListener('click',()=>{
-  camera=initialCamera();interactive=false;warmVersion++;status.textContent='';panels.forEach(panel=>panel.cloud.classList.remove('interactive'));
+  camera=initialCamera();interactive=false;status.textContent='';panels.forEach(panel=>panel.cloud.classList.remove('interactive'));
 });
 // Do not mix the ahead-of-display media clock with presented-frame callbacks.
 video.addEventListener('timeupdate',()=>{if(scene&&mediaReady&&playing&&!preciseVideoFrames)showFrame(Math.min(9,Math.floor((video.currentTime+1e-6)/.25)));});
@@ -313,4 +350,5 @@ try {
     button.addEventListener('click',()=>selectScene(row));$('#scenes').append(button);
   }
   selectScene(manifest.scenes[0]);
+  window.addEventListener('online',preloadEverything);
 }catch(error){status.textContent='Comparison assets unavailable';console.error(error);}
