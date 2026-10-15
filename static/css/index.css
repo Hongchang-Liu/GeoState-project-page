@@ -691,6 +691,15 @@ a:focus {
   outline-offset: 2px;
 }
 
+/* Keep keyboard focus visible without leaving a ring after a pointer click. */
+.publication-links a[href="https://github.com/Hongchang-Liu/GeoState"]:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: var(--shadow-md);
+}
+.publication-links a[href="https://github.com/Hongchang-Liu/GeoState"]:hover:focus:not(:focus-visible) {
+  box-shadow: var(--shadow-lg);
+}
+
 
 /* Print styles */
 @media print {
