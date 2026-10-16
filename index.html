@@ -53,7 +53,9 @@
   <meta name="citation_author" content="Ma, Fei">
   <meta name="citation_author" content="Xu, Xing">
   <meta name="citation_author" content="Bin, Yi">
-  <meta name="citation_pdf_url" content="static/pdfs/geostate.pdf">
+  <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2610.22343">
+  <meta name="citation_arxiv_id" content="2610.22343">
+  <meta name="citation_publication_date" content="2026/10/15">
   
   <!-- Additional SEO -->
   <meta name="theme-color" content="#2563eb">
@@ -169,7 +171,7 @@
     "zero-shot generalization"
   ],
   "abstract": "Recent 3D world models increasingly use features from geometry foundation models (GFMs) as predictive world states, benefiting from their rich geometric priors. However, the view dependence of these features entangles scene dynamics with camera-induced variation, making the resulting state evolution harder to predict. We propose GeoState, a view-decoupled geometry representation for predictive 3D world modeling that separates scene-state evolution from camera-dependent observation. Specifically, a scene tokenizer aggregates multi-view GFM features into a view-decoupled scene state, which a geometry decoder queries using camera rays. An autoregressive world model then predicts future scene states, while camera motion is modeled separately. The predicted states can therefore be decoded under either predicted or externally specified cameras, while retaining a single context-derived scale throughout the rollout without per-frame scale alignment. Experiments show that GeoState outperforms prior 3D world models on Waymo, supports geometrically consistent cross-view querying, and generalizes zero-shot to KITTI and nuScenes.",
-  "citation": "@misc{liu_geostate,\n  title={{GeoState}: Learning View-Decoupled Geometry States for {3D} World Modeling},\n  author={Hongchang Liu and Jian Liu and Yujuan Ding and Liang Peng and Xun Jiang and Fei Ma and Xing Xu and Yi Bin}\n}",
+  "citation": "@misc{liu2026geostatelearningviewdecoupledgeometry,\n  title={GeoState: Learning View-Decoupled Geometry States for 3D World Modeling},\n  author={Hongchang Liu and Jian Liu and Yujuan Ding and Liang Peng and Xun Jiang and Fei Ma and Xing Xu and Yi Bin},\n  year={2026},\n  eprint={2610.22343},\n  archivePrefix={arXiv},\n  primaryClass={cs.CV},\n  url={https://arxiv.org/abs/2610.22343},\n}",
   "isAccessibleForFree": true,
   "about": [
     {
@@ -247,7 +249,7 @@
               <div class="column has-text-centered">
                 <div class="publication-links">
                   <span class="link-block">
-                    <a class="external-link button is-normal is-rounded is-dark" aria-disabled="true" title="Paper link unavailable">
+                    <a href="https://arxiv.org/pdf/2610.22343" target="_blank" rel="noopener" class="external-link button is-normal is-rounded is-dark">
                       <span class="icon"><i class="fas fa-file-pdf" aria-hidden="true"></i></span><span>Paper</span>
                     </a>
                   </span>
@@ -257,7 +259,7 @@
                     </a>
                   </span>
                   <span class="link-block">
-                    <a class="external-link button is-normal is-rounded is-dark" aria-disabled="true" title="arXiv link coming soon">
+                    <a href="https://arxiv.org/abs/2610.22343" target="_blank" rel="noopener" class="external-link button is-normal is-rounded is-dark">
                       <span class="icon"><i class="ai ai-arxiv" aria-hidden="true"></i></span><span>arXiv</span>
                     </a>
                   </span>
@@ -345,9 +347,14 @@
           <h2 class="title has-text-centered" id="bibtex-heading">BibTeX</h2>
           <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard" type="button"><i class="fas fa-copy" aria-hidden="true"></i><span class="copy-text">Copy</span></button>
         </div>
-        <pre id="bibtex-code"><code>@misc{liu_geostate,
-  title={{GeoState}: Learning View-Decoupled Geometry States for {3D} World Modeling},
-  author={Hongchang Liu and Jian Liu and Yujuan Ding and Liang Peng and Xun Jiang and Fei Ma and Xing Xu and Yi Bin}
+        <pre id="bibtex-code"><code>@misc{liu2026geostatelearningviewdecoupledgeometry,
+  title={GeoState: Learning View-Decoupled Geometry States for 3D World Modeling},
+  author={Hongchang Liu and Jian Liu and Yujuan Ding and Liang Peng and Xun Jiang and Fei Ma and Xing Xu and Yi Bin},
+  year={2026},
+  eprint={2610.22343},
+  archivePrefix={arXiv},
+  primaryClass={cs.CV},
+  url={https://arxiv.org/abs/2610.22343},
 }</code></pre>
       </div>
     </section>
