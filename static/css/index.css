@@ -692,11 +692,11 @@ a:focus {
 }
 
 /* Keep keyboard focus visible without leaving a ring after a pointer click. */
-.publication-links a[href="https://github.com/Hongchang-Liu/GeoState"]:focus:not(:focus-visible) {
+.publication-links a[href]:focus:not(:focus-visible) {
   outline: none;
   box-shadow: var(--shadow-md);
 }
-.publication-links a[href="https://github.com/Hongchang-Liu/GeoState"]:hover:focus:not(:focus-visible) {
+.publication-links a[href]:hover:focus:not(:focus-visible) {
   box-shadow: var(--shadow-lg);
 }
 
