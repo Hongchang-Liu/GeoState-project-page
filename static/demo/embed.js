@@ -25,7 +25,10 @@ window.addEventListener('message', event => {
   if(event.source!==iframe?.contentWindow)return;
   if(event.data?.type==='geostate-demo-height'){
     const height=Number(event.data.height);
-    if(Number.isFinite(height)&&height>=300&&height<=3000)iframe.style.height=`${height}px`;
+    if(Number.isFinite(height)&&height>=300&&height<=3000){
+      const target=Math.ceil(height)+2;
+      if(Math.abs(iframe.getBoundingClientRect().height-target)>1)iframe.style.height=`${target}px`;
+    }
   }else if(event.data?.type==='geostate-demo-decode-idle'){
     releasePriority();
   }else if(event.data?.type==='geostate-demo-preview-activity'){

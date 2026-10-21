@@ -37,6 +37,8 @@ export class DecodedImages {
     // The same decoded element is reused on revisits; preserve display attributes.
     for(const name of next.getAttributeNames())if(!['src','decoding','fetchpriority'].includes(name))next.removeAttribute(name);
     for(const attr of current.attributes)if(!['src','srcset','loading','decoding','fetchpriority'].includes(attr.name))next.setAttribute(attr.name,attr.value);
+    next.width=next.naturalWidth;next.height=next.naturalHeight;
+    if(id==='world')current.parentElement.style.aspectRatio=`${next.naturalWidth} / ${next.naturalHeight}`;
     current.replaceWith(next);return next;
   }
   detach(id){
@@ -45,6 +47,7 @@ export class DecodedImages {
     // Live Blob URLs must never overwrite a retained static-frame element.
     const next=document.createElement('img');
     for(const attr of current.attributes)if(attr.name!=='src')next.setAttribute(attr.name,attr.value);
+    next.width=current.naturalWidth||current.width;next.height=current.naturalHeight||current.height;
     current.replaceWith(next);return next;
   }
 }

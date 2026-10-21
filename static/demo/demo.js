@@ -1,5 +1,6 @@
 import {API_BASE, REQUEST_DELAY_MS} from './config.js?v=20261014-tunnel-test';
-import {DecodedImages,afterImagePaint} from './decoded-images.js?v=20261021-decoded-frames';
+import {DecodedImages,afterImagePaint} from './decoded-images.js?v=20261021-stable-stage';
+if(window.parent!==window)document.documentElement.classList.add('embedded-demo');
 
 const $ = id => document.getElementById(id);
 const labels = {waymo:'Waymo',kitti:'KITTI',nuscenes:'nuScenes'};
@@ -7,7 +8,7 @@ const keys = ['x','y','z','yaw','pitch'];
 const offset = Object.fromEntries(keys.map(key=>[key,0]));
 let scenes=[],scene=null,page=0,frame=0,online=false,playing=null;
 let version=0,debounce=null,sceneVersion=0,visible=true,loadingScene=false;
-let liveImageUrl=null,cloudWorker=null,workerSequence=0;
+let liveImageUrl=null,pendingDepth=null,cloudWorker=null,workerSequence=0;
 const workerJobs=new Map();
 const liveCache=new Map(),CACHE_BYTES=96*1024*1024,CACHE_ENTRIES=33;
 const TIME_REQUEST_DELAY_MS=60,PREFETCH_IDLE_MS=600,PREFETCH_GAP_MS=400;
@@ -64,11 +65,6 @@ function errorStatus(error){
   status(label,'error',detail);
 }
 const sceneName=item=>`Scene ${String(scenes.findIndex(row=>row.id===item.id)+1).padStart(3,'0')}`;
-function image(id,url){
-  if(id==='world'&&liveImageUrl&&url!==liveImageUrl){URL.revokeObjectURL(liveImageUrl);liveImageUrl=null;}
-  if($(id).getAttribute('src')!==url)decodedImages.detach(id);
-  if($(id).getAttribute('src')!==url){if(id==='world')delete $(id).dataset.renderKey;$(id).src=url;}
-}
 function previewIsCurrent(query,ticket){return ticket===version&&isCurrent(query);}
 async function showReferenceImages(query,ticket){
   const selected=query.selected;
@@ -162,17 +158,31 @@ function cacheDiagnostics(){
   canvas.dataset.cacheBytes=String(cacheBytes);canvas.dataset.cacheEntries=String(liveCache.size);
 }
 function showDepth(query,blob,metadata,started){
-  if(!isCurrent(query))return;
-  if($('world').dataset.renderKey!==query.key||$('world').getAttribute('src')!==liveImageUrl){
-    const url=URL.createObjectURL(blob);image('world',url);liveImageUrl=url;$('world').dataset.renderKey=query.key;
-  }
-  $('query-viewport').classList.remove('awaiting');
-  $('world').dataset.depthReadyMs=String(performance.now()-started);
-  $('camera-map').dataset.cloudStatus='processing';
+  if(!isCurrent(query))return Promise.resolve(false);
+  if($('world').dataset.renderKey===query.key&&$('world').getAttribute('src')===liveImageUrl)return Promise.resolve(true);
+  if(pendingDepth?.query.key===query.key&&pendingDepth.blob===blob)return pendingDepth.pending;
+  const job={query,blob,pending:null},url=URL.createObjectURL(blob),next=new Image();pendingDepth=job;
+  next.decoding='async';next.src=url;
+  job.pending=(async()=>{
+    try{
+      // Never insert a source-less or undecoded image into the responsive stage.
+      await next.decode();
+      if(pendingDepth!==job||!isCurrent(query)){URL.revokeObjectURL(url);return false;}
+      const previous=liveImageUrl;
+      const world=decodedImages.show('world',{image:next,ready:true});
+      liveImageUrl=url;if(previous)URL.revokeObjectURL(previous);
+      world.dataset.renderKey=query.key;delete world.dataset.previewKey;
+      $('query-viewport').classList.remove('awaiting');
+      world.dataset.depthReadyMs=String(performance.now()-started);
+      $('camera-map').dataset.cloudStatus='processing';return true;
+    }catch(error){URL.revokeObjectURL(url);if(isCurrent(query))errorStatus(error);return false;}
+    finally{if(pendingDepth===job)pendingDepth=null;}
+  })();
+  return job.pending;
 }
-function showRender(query,entry,started,hit=false){
+async function showRender(query,entry,started,hit=false){
   if(!isCurrent(query))return;
-  showDepth(query,entry.image,entry.metadata,started);
+  if(!await showDepth(query,entry.image,entry.metadata,started)||!isCurrent(query))return;
   diagram.setPreparedCloud(entry.cloud);
   const canvas=$('camera-map');canvas.dataset.cloudStatus='ready';canvas.dataset.renderKey=query.key;
   canvas.dataset.cacheHit=String(hit);canvas.dataset.localCloudMs=String(hit?0:entry.localMs);
@@ -372,7 +382,7 @@ async function decode(){
     if(!cloudBuffer)throw new Error('Depth ready · point cloud unavailable');
     const cloud=diagram.prepareCloud(cloudBuffer),entry={key:query.key,view:query.view,image:job.image,
       metadata:job.metadata,cloud,stats,localMs,size:4096+job.image.size+(cloud?cloud.xyz.byteLength+cloud.rgb.byteLength+cloud.bounds.length*96:0)};
-    cacheRender(entry);showRender(query,entry,job.started);
+    cacheRender(entry);await showRender(query,entry,job.started);
   }catch(error){
     if(!job.cancelled){
       if(job.background){prefetchSkipped.add(query.key);warmDue=performance.now()+1500;}

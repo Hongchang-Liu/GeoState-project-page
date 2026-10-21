@@ -40,6 +40,8 @@
 .comparison-grid .small-view img{width:100%;height:auto;object-fit:contain}
 .query-viewport.awaiting::after{content:none;display:none}
 /* Follow the parent page's full-HD container without scaling text or controls. */
+/* The parent page scrolls embedded demos; internal scrollbars must not resize them. */
+html.embedded-demo{overflow:hidden}
 .demo{max-width:1344px}
 /* Prevent dense time ticks from forcing the narrow-screen slider beyond its grid. */
 @media(max-width:680px){.timeline{grid-template-columns:28px minmax(0,1fr) 85px}.time-ticks>span:nth-child(even){display:none}}
