@@ -108,7 +108,12 @@ async function showStaticFrame(query,ticket,started){
     },0);
     await references;
     if(!previewIsCurrent(query,ticket))return;
-    await afterImagePaint();presentation.references=true;finishStaticPresentation();
+    await afterImagePaint();
+    if(!previewIsCurrent(query,ticket))return;
+    presentation.references=true;
+    // A late GT reference can change the camera-icon aspect ratio.
+    if(diagram.cloud?.assetKey===query.selected.fixed_pointcloud)diagram.draw(false);
+    finishStaticPresentation();
   }catch(error){
     if(previewIsCurrent(query,ticket)){errorStatus(error);releasePreviewPriority(priority);staticPresentation=null;}
   }
