@@ -2,8 +2,13 @@
 const iframe = document.getElementById('geostate-live-demo');
 const comparison = document.getElementById('geostate-comparison');
 let decoderBusy=false,activeRequest=null,resumeTimer=null,leaseTimer=null;
+let previewBusy=false,previewRequest=null,previewResume=null,previewLease=null;
 function forwardPriority(){
-  comparison?.contentWindow?.postMessage({type:'geostate-comparison-download-priority',busy:decoderBusy},location.origin);
+  comparison?.contentWindow?.postMessage({type:'geostate-comparison-download-priority',busy:decoderBusy||previewBusy},location.origin);
+}
+function releasePreview(){
+  clearTimeout(previewResume);clearTimeout(previewLease);
+  previewBusy=false;previewRequest=null;forwardPriority();
 }
 function releasePriority(){
   clearTimeout(resumeTimer);clearTimeout(leaseTimer);
@@ -23,6 +28,16 @@ window.addEventListener('message', event => {
     if(Number.isFinite(height)&&height>=300&&height<=3000)iframe.style.height=`${height}px`;
   }else if(event.data?.type==='geostate-demo-decode-idle'){
     releasePriority();
+  }else if(event.data?.type==='geostate-demo-preview-activity'){
+    const {busy,requestId}=event.data;
+    if(typeof busy!=='boolean'||typeof requestId!=='string'||requestId.length>100)return;
+    if(busy){
+      clearTimeout(previewResume);clearTimeout(previewLease);
+      previewBusy=true;previewRequest=requestId;forwardPriority();
+      previewLease=setTimeout(releasePreview,45000);
+    }else if(previewRequest===requestId){
+      clearTimeout(previewResume);previewResume=setTimeout(releasePreview,350);
+    }
   }else if(event.data?.type==='geostate-demo-decode-activity'){
     const {busy,requestId}=event.data;
     if(typeof busy!=='boolean'||typeof requestId!=='string'||requestId.length>100)return;

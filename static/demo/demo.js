@@ -1,4 +1,5 @@
 import {API_BASE, REQUEST_DELAY_MS} from './config.js?v=20261014-tunnel-test';
+import {DecodedImages,afterImagePaint} from './decoded-images.js?v=20261021-decoded-frames';
 
 const $ = id => document.getElementById(id);
 const labels = {waymo:'Waymo',kitti:'KITTI',nuscenes:'nuScenes'};
@@ -19,6 +20,8 @@ const GEOMETRY_LAYER_BYTES=64*1024*1024,GEOMETRY_LAYER_ENTRIES=22;
 const geometryLayers=new Map(),geometryJobs=new Map();
 let geometryLayerBytes=0,staticCloudBytes=0,geometryWorker=null,geometrySequence=0,geometryWorkerFailed=false;
 let geometryWarmToken=0,geometryWarmSignature='';
+const decodedImages=new DecodedImages();
+let pendingFrameUpdate=0,staticPresentation=null,previewPriority=null;
 const identity = ()=>[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
 let api = API_BASE.trim().replace(/\/$/,'');
 if (!api && ['localhost','127.0.0.1'].includes(location.hostname)) api=`${location.protocol}//${location.hostname}:8090`;
@@ -37,11 +40,23 @@ function announceDecodeState(){
   if(window.parent===window)return;
   if(activeJob)announceDecodePriority(activeJob,true);
   else window.parent.postMessage({type:'geostate-demo-decode-idle'},location.origin);
+  if(previewPriority)announcePreviewPriority(previewPriority,true);
+}
+function announcePreviewPriority(requestId,busy){
+  if(window.parent!==window)window.parent.postMessage({type:'geostate-demo-preview-activity',requestId,busy},location.origin);
+}
+function releasePreviewPriority(requestId=previewPriority){
+  if(!requestId||requestId!==previewPriority)return;
+  announcePreviewPriority(requestId,false);previewPriority=null;
+}
+function beginPreviewPriority(){
+  const requestId=`preview-${Date.now()}-${++prioritySequence}`;
+  previewPriority=requestId;announcePreviewPriority(requestId,true);return requestId;
 }
 window.addEventListener('message',event=>{
   if(event.origin===location.origin&&event.source===window.parent&&event.data?.type==='geostate-demo-priority-query')announceDecodeState();
 });
-window.addEventListener('pagehide',()=>{if(activeJob)announceDecodePriority(activeJob,false);});
+window.addEventListener('pagehide',()=>{if(activeJob)announceDecodePriority(activeJob,false);releasePreviewPriority();});
 announceDecodeState();
 function errorStatus(error){
   const detail=error.message||String(error);
@@ -51,7 +66,68 @@ function errorStatus(error){
 const sceneName=item=>`Scene ${String(scenes.findIndex(row=>row.id===item.id)+1).padStart(3,'0')}`;
 function image(id,url){
   if(id==='world'&&liveImageUrl&&url!==liveImageUrl){URL.revokeObjectURL(liveImageUrl);liveImageUrl=null;}
+  if($(id).getAttribute('src')!==url)decodedImages.detach(id);
   if($(id).getAttribute('src')!==url){if(id==='world')delete $(id).dataset.renderKey;$(id).src=url;}
+}
+function previewIsCurrent(query,ticket){return ticket===version&&isCurrent(query);}
+async function showReferenceImages(query,ticket){
+  const selected=query.selected;
+  await Promise.all([['rgb',selected.rgb],['gt',selected.gt_depth],['copy',selected.copy_depth]].map(async([id,url])=>{
+    const entry=decodedImages.get(id,url);if(!entry.ready)await entry.pending;
+    if(previewIsCurrent(query,ticket))decodedImages.show(id,entry);
+  }));
+}
+function finishStaticPresentation(){
+  const current=staticPresentation,canvas=$('camera-map');
+  if(!current||!previewIsCurrent(current.query,current.ticket)||!current.painted||!current.references)return;
+  if(canvas.dataset.geometryReady!=='true'||canvas.dataset.geometryFrameKey!==current.query.key)return;
+  status(online?'Ready':'Offline',online?'live':'','Decoded images and the selected pointmap are displayed');
+  releasePreviewPriority(current.priority);staticPresentation=null;
+}
+async function showStaticFrame(query,ticket,started){
+  const priority=beginPreviewPriority();
+  const presentation={query,ticket,priority,painted:false,references:false};staticPresentation=presentation;
+  status('Updating…');
+  try{
+    const entry=decodedImages.get('world',query.selected.fixed_depth);
+    const references=showReferenceImages(query,ticket);references.catch(()=>{});
+    if(!entry.ready)await entry.pending;
+    if(!previewIsCurrent(query,ticket))return;
+    if(liveImageUrl){URL.revokeObjectURL(liveImageUrl);liveImageUrl=null;}
+    const world=decodedImages.show('world',entry);delete world.dataset.renderKey;
+    world.dataset.previewKey=query.key;world.dataset.depthReadyMs=String(performance.now()-started);
+    $('query-viewport').classList.remove('awaiting');
+    await afterImagePaint();
+    if(!previewIsCurrent(query,ticket))return;
+    presentation.painted=true;
+    // Image display is independent of network, decompression, and point rasterization.
+    setTimeout(()=>{
+      if(!previewIsCurrent(query,ticket))return;
+      loadCloud(query.selected.fixed_pointcloud,ticket).then(()=>finishStaticPresentation());
+      warmSceneImages();
+    },0);
+    await references;
+    if(!previewIsCurrent(query,ticket))return;
+    await afterImagePaint();presentation.references=true;finishStaticPresentation();
+  }catch(error){
+    if(previewIsCurrent(query,ticket)){errorStatus(error);releasePreviewPriority(priority);staticPresentation=null;}
+  }
+}
+let imageWarmScene=0;
+function warmSceneImages(){
+  if(!scene||imageWarmScene===sceneVersion)return;
+  imageWarmScene=sceneVersion;const ticket=sceneVersion,rows=[scene.anchor_frame,...scene.frames];
+  const items=[...rows.map(row=>['world',row.fixed_depth]),...rows.flatMap(row=>[['rgb',row.rgb],['gt',row.gt_depth],['copy',row.copy_depth]])];
+  let index=0;
+  const warm=async()=>{
+    while(ticket===sceneVersion&&index<items.length){
+      const [id,url]=items[index++];
+      try{await decodedImages.get(id,url,false).pending;}catch{/* Demand loads retry failed previews. */}
+      await new Promise(resolve=>setTimeout(resolve,0));
+    }
+  };
+  // Bound background image work; a requested frame can start immediately.
+  warm();warm();
 }
 function queryAt(index=frame){
   if(!scene)return null;
@@ -95,7 +171,7 @@ function showRender(query,entry,started,hit=false){
   const canvas=$('camera-map');canvas.dataset.cloudStatus='ready';canvas.dataset.renderKey=query.key;
   canvas.dataset.cacheHit=String(hit);canvas.dataset.localCloudMs=String(hit?0:entry.localMs);
   canvas.dataset.cloudReadyMs=String(performance.now()-started);canvas.dataset.cloudStats=JSON.stringify(entry.stats||{});
-  cacheDiagnostics();status(hit?'Ready · cached':`Ready · ${Math.round(entry.metadata.latency_ms)} ms`,online?'live':'');
+  cacheDiagnostics();status(hit?'Ready':`Ready · ${Math.round(entry.metadata.latency_ms)} ms`,online?'live':'');
 }
 function cancelBackground(){
   if(activeJob?.background){activeJob.cancelled=true;activeJob.controller.abort();}
@@ -181,6 +257,7 @@ function renderCards(){
   }
 }
 async function select(item){
+  cancelAnimationFrame(pendingFrameUpdate);pendingFrameUpdate=0;staticPresentation=null;releasePreviewPriority();
   const ticket=++sceneVersion;version++;loadingScene=true;stop();clearTimeout(debounce);warmDue=Infinity;cancelObsoleteView();status('Loading scene');
   geometryWarmToken++;geometryWarmSignature='';delete $('camera-map').dataset.geometryWarmed;
   try{
@@ -188,9 +265,8 @@ async function select(item){
     const data=await response.json();if(ticket!==sceneVersion)return;
     loadingScene=false;scene=data;frame=0;diagram.defaultObserver=true;diagram.endQueryPreview();diagram.cloud=null;diagram.fitBounds=[];diagram.viewReady=false;diagram.pan=[0,0,0];resetOffsets();$('time').value=0;$('time').max=scene.frames.length;
     $('time-ticks').replaceChildren(...[scene.anchor_frame,...scene.frames].map(row=>{const span=document.createElement('span');span.textContent=row.seconds.toFixed(2);return span;}));
+    decodedImages.pin([scene.anchor_frame,...scene.frames].flatMap(row=>[['world',row.fixed_depth],['rgb',row.rgb],['gt',row.gt_depth],['copy',row.copy_depth]]));
     renderCards();updateFrame();
-    // Decode-free references load with scene selection and are browser-cached.
-    for(const row of [scene.anchor_frame,...scene.frames])for(const url of [row.rgb,row.gt_depth,row.copy_depth,row.fixed_depth]){const img=new Image();img.src=url;}
   }catch(error){if(ticket===sceneVersion){loadingScene=false;errorStatus(error);}}
 }
 const frameData=()=>frame===0?scene.anchor_frame:scene.frames[frame-1];
@@ -201,12 +277,16 @@ function updateFrame(){
   diagram.autoFit=false;
   const selected=frameData();$('time-value').textContent=`t + ${selected.seconds.toFixed(2)} s`;
   $('time').setAttribute('aria-valuetext',`${selected.seconds.toFixed(2)} seconds after anchor`);
-  image('rgb',selected.rgb);image('gt',selected.gt_depth);image('copy',selected.copy_depth);
   requestRender();
+}
+function scheduleFrameUpdate(){
+  if(pendingFrameUpdate)return;
+  pendingFrameUpdate=requestAnimationFrame(()=>{pendingFrameUpdate=0;updateFrame();});
 }
 function requestRender(fromKeyboard=false){
   const started=performance.now();version++;updateControls();clearTimeout(debounce);
   if(!scene||loadingScene)return;
+  staticPresentation=null;
   const query=queryAt(),hit=cachedRender(query.key),staticQuery=isStaticQuery();
   if(activeView!==query.view){activeView=query.view;prefetchSkipped=new Set();cancelObsoleteView();}
   failedCurrent='';warmDue=started+PREFETCH_IDLE_MS;
@@ -214,12 +294,13 @@ function requestRender(fromKeyboard=false){
   if(!hit&&!staticQuery)diagram.draw(true);cacheDiagnostics();
   if(staticQuery){
     cancelBackground();
-    const selected=frameData();image('world',selected.fixed_depth);
-    $('query-viewport').classList.remove('awaiting');
-    status(online?'Ready · cached':'Cached · offline',online?'live':'',online?'Live decoder ready; cached anchor view':'Cached preview; live service not connected');
-    loadCloud(selected.fixed_pointcloud,version);
+    showStaticFrame(query,version,started);
     return;
   }
+  releasePreviewPriority();
+  showReferenceImages(query,version).then(()=>{
+    if(isCurrent(query))setTimeout(()=>{if(isCurrent(query))diagram.draw(false);},0);
+  }).catch(error=>{if(isCurrent(query))errorStatus(error);});
   if(hit){showRender(query,hit,started,true);scheduleDecode(PREFETCH_IDLE_MS);return;}
   warmLocalAnnotations();
   $('camera-map').dataset.cacheHit='false';
@@ -411,10 +492,10 @@ async function loadCloud(url,ticket){
   const cachedEntry=cloudCache.get(url),cached=cachedEntry?.cloud;
   if(cached){cloudCache.delete(url);cloudCache.set(url,cachedEntry);}
   if(cached){if(ticket===version)diagram.setPreparedCloud(cached);return;}
-  diagram.setCloud(null);
+  $('camera-map').dataset.cloudStatus='loading';
   try{
     const cloud=await preparedCloud(url);if(ticket===version)diagram.setPreparedCloud(cloud);
-  }catch{if(ticket===version)$('camera-map').dataset.cloudStatus='error';}
+  }catch{if(ticket===version){$('camera-map').dataset.cloudStatus='error';status('Pointmap unavailable','error');releasePreviewPriority();}}
 }
 async function checkHealth(){
   if(!api){status('Cached · offline','','Public live API not configured');return;}
@@ -572,7 +653,7 @@ class CameraDiagram{
       if(entry?.bitmap){
         geometryLayers.delete(key);geometryLayers.set(key,entry);ctx.drawImage(entry.bitmap,0,0,width,height);
         this.canvas.dataset.geometryReady='true';this.canvas.dataset.geometryCacheHit='true';this.canvas.dataset.geometryFrameKey=queryAt().key;
-        this.canvas.dataset.geometryRenderMode='cached';geometryDiagnostics();return;
+        this.canvas.dataset.geometryRenderMode='cached';geometryDiagnostics();finishStaticPresentation();return;
       }
       this.canvas.dataset.geometryReady='false';this.canvas.dataset.geometryCacheHit='false';
       this.canvas.dataset.geometryRenderMode='warming';
@@ -592,6 +673,7 @@ class CameraDiagram{
     mainThreadCloudLayer(this.cloud,geometrySnapshot(view,width,height),this.cloudCanvas);ctx.drawImage(this.cloudCanvas,0,0,width,height);
     this.canvas.dataset.geometryReady='true';this.canvas.dataset.geometryCacheHit='false';this.canvas.dataset.geometryRenderMode='interactive';
     this.canvas.dataset.geometryFrameKey=queryAt().key;
+    finishStaticPresentation();
   }
   detail(ctx,width,height){
     // Only keyboard query changes enable the inset. Time/decoder redraws cannot.
@@ -636,7 +718,7 @@ new ResizeObserver(()=>{
 }).observe($('query-viewport'));
 $('fit').addEventListener('click',()=>{diagram.defaultObserver=true;geometryWarmToken++;geometryWarmSignature='';diagram.endQueryPreview();diagram.autoFit=true;diagram.zoom=1;diagram.pan=[0,0,0];diagram.draw(true);warmDefaultGeometry();});
 $('previous').addEventListener('click',()=>{page--;renderCards();});$('next').addEventListener('click',()=>{page++;renderCards();});
-$('time').addEventListener('input',()=>{frame=+$('time').value;updateFrame();});
+$('time').addEventListener('input',()=>{frame=+$('time').value;scheduleFrameUpdate();});
 $('play').addEventListener('click',()=>{diagram.endQueryPreview();diagram.allowDetail=false;diagram.autoFit=false;diagram.draw(true);if(playing){stop();return;}if(!scene||loadingScene)return; $('play').textContent='Ⅱ';$('play').setAttribute('aria-label','Pause future sequence');playing=setInterval(()=>{if(!visible)return;frame=(frame+1)%(scene.frames.length+1);$('time').value=frame;updateFrame();},PLAY_INTERVAL_MS);});
 $('reset').addEventListener('click',()=>{resetOffsets();requestRender();});
 const limits={x:[-30,30],y:[-10,10],z:[-30,60],yaw:[-90,90],pitch:[-45,45]};
@@ -663,8 +745,7 @@ if(window.parent!==window){try{
   parent.document.addEventListener('keydown',parentKey);
   window.addEventListener('pagehide',()=>parent.document.removeEventListener('keydown',parentKey));
 }catch{/* Cross-origin embeds still support keyboard control inside the demo. */}}
-$('gt').addEventListener('load',()=>diagram.draw(true));
-document.addEventListener('visibilitychange',()=>{visible=!document.hidden;if(!visible){stop();clearTimeout(debounce);cancelBackground();}else if(scene)requestRender();});
+document.addEventListener('visibilitychange',()=>{visible=!document.hidden;if(!visible){stop();clearTimeout(debounce);cancelBackground();releasePreviewPriority();}else if(scene)requestRender();});
 if(window.parent!==window){const observer=new ResizeObserver(()=>parent.postMessage({type:'geostate-demo-height',height:Math.ceil(document.body.getBoundingClientRect().height)},location.origin));observer.observe(document.body);}
 async function start(){try{const response=await fetch('manifest.json',{cache:'no-store'});if(!response.ok)throw new Error('Selected scene manifest is unavailable');scenes=(await response.json()).scenes;renderCards();await select(scenes[0]);await checkHealth();}catch(error){errorStatus(error);}}
 start();
