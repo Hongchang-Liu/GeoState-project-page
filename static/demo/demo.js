@@ -80,6 +80,7 @@ async function showReferenceImages(query,ticket){
 function finishStaticPresentation(){
   const current=staticPresentation,canvas=$('camera-map');
   if(!current||!previewIsCurrent(current.query,current.ticket)||!current.painted||!current.references)return;
+  if(diagram.cloud?.assetKey!==current.query.selected.fixed_pointcloud)return;
   if(canvas.dataset.geometryReady!=='true'||canvas.dataset.geometryFrameKey!==current.query.key)return;
   status(online?'Ready':'Offline',online?'live':'','Decoded images and the selected pointmap are displayed');
   releasePreviewPriority(current.priority);staticPresentation=null;
