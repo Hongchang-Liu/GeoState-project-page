@@ -1,4 +1,4 @@
-import {API_BASE, REQUEST_DELAY_MS} from './config.js?v=20261014-tunnel-test';
+import {API_BASE, REQUEST_DELAY_MS} from './config.js?v=20261027-tunnel';
 import {DecodedImages,afterImagePaint} from './decoded-images.js?v=20261021-stable-stage';
 if(window.parent!==window)document.documentElement.classList.add('embedded-demo');
 
