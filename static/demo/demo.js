@@ -23,6 +23,8 @@ let geometryLayerBytes=0,staticCloudBytes=0,geometryWorker=null,geometrySequence
 let geometryWarmToken=0,geometryWarmSignature='';
 const decodedImages=new DecodedImages();
 let pendingFrameUpdate=0,staticPresentation=null,previewPriority=null;
+const HEALTH_TIMEOUT_MS=12000,HEALTH_POLL_MS=30000,HEALTH_RETRY_MS=[1000,2000,4000,8000,15000];
+let healthTimer=null,healthController=null,healthInFlight=false,healthFailures=0,healthStopped=false;
 const identity = ()=>[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
 let api = API_BASE.trim().replace(/\/$/,'');
 if (!api && ['localhost','127.0.0.1'].includes(location.hostname)) api=`${location.protocol}//${location.hostname}:8090`;
@@ -57,7 +59,7 @@ function beginPreviewPriority(){
 window.addEventListener('message',event=>{
   if(event.origin===location.origin&&event.source===window.parent&&event.data?.type==='geostate-demo-priority-query')announceDecodeState();
 });
-window.addEventListener('pagehide',()=>{if(activeJob)announceDecodePriority(activeJob,false);releasePreviewPriority();});
+window.addEventListener('pagehide',()=>{healthStopped=true;stopHealthChecks();if(activeJob)announceDecodePriority(activeJob,false);releasePreviewPriority();});
 announceDecodeState();
 function errorStatus(error){
   const detail=error.message||String(error);
@@ -78,7 +80,8 @@ function finishStaticPresentation(){
   if(!current||!previewIsCurrent(current.query,current.ticket)||!current.painted||!current.references)return;
   if(diagram.cloud?.assetKey!==current.query.selected.fixed_pointcloud)return;
   if(canvas.dataset.geometryReady!=='true'||canvas.dataset.geometryFrameKey!==current.query.key)return;
-  status(online?'Ready':'Offline',online?'live':'','Decoded images and the selected pointmap are displayed');
+  if(online)status('Ready','live','Decoded images and the selected pointmap are displayed');
+  else connectionStatus();
   releasePreviewPriority(current.priority);staticPresentation=null;
 }
 async function showStaticFrame(query,ticket,started){
@@ -322,7 +325,7 @@ function requestRender(fromKeyboard=false){
   $('camera-map').dataset.cacheHit='false';
   diagram.setCloud(null);
   $('query-viewport').classList.add('awaiting');
-  if(!online){status('Offline','error','Live decoding unavailable; cached reference only');return;}
+  if(!online){connectionStatus();if(!healthTimer&&!healthInFlight)scheduleHealthCheck(0);return;}
   foregroundDue=started+(fromKeyboard?REQUEST_DELAY_MS:TIME_REQUEST_DELAY_MS);
   status('Decoding…');
   if(activeJob?.background){
@@ -387,6 +390,7 @@ async function decode(){
     if(!job.cancelled){
       if(job.background){prefetchSkipped.add(query.key);warmDue=performance.now()+1500;}
       if(isCurrent(query)){failedCurrent=query.key;$('camera-map').dataset.cloudStatus='error';errorStatus(error);}
+      if(error instanceof TypeError||['AbortError','TimeoutError'].includes(error.name))scheduleHealthCheck(0);
     }
   }finally{
     announceDecodePriority(job,false);
@@ -513,12 +517,54 @@ async function loadCloud(url,ticket){
     const cloud=await preparedCloud(url);if(ticket===version)diagram.setPreparedCloud(cloud);
   }catch{if(ticket===version){$('camera-map').dataset.cloudStatus='error';status('Pointmap unavailable','error');releasePreviewPriority();}}
 }
-async function checkHealth(){
+function connectionStatus(){
   if(!api){status('Cached · offline','','Public live API not configured');return;}
-  try{const response=await fetch(api+'/api/health',{signal:AbortSignal.timeout(5000)});const health=await response.json();online=response.ok&&health.ready;
-    if(online&&scene)requestRender();else if(!online)status('Connecting…','','Cached preview; live decoder starting');
-  }catch{online=false;if(scene)requestRender();else status('Offline');}
+  status(navigator.onLine===false?'Offline · retrying':'Connecting…','','Live decoder connection is being retried automatically; cached previews remain available');
 }
+function stopHealthChecks(){
+  clearTimeout(healthTimer);healthTimer=null;healthController?.abort();
+}
+function scheduleHealthCheck(delay=0){
+  clearTimeout(healthTimer);healthTimer=null;
+  if(!api||!visible||healthStopped)return;
+  healthTimer=setTimeout(()=>{healthTimer=null;checkHealth();},delay);
+}
+async function checkHealth(){
+  if(!api){connectionStatus();return;}
+  if(!visible||healthStopped||healthInFlight)return;
+  clearTimeout(healthTimer);healthTimer=null;
+  if(navigator.onLine===false){
+    online=false;connectionStatus();
+    scheduleHealthCheck(HEALTH_RETRY_MS[Math.min(healthFailures++,HEALTH_RETRY_MS.length-1)]);return;
+  }
+  healthInFlight=true;
+  const controller=new AbortController();healthController=controller;
+  const timeout=setTimeout(()=>controller.abort(),HEALTH_TIMEOUT_MS);
+  try{
+    const response=await fetch(api+'/api/health',{cache:'no-store',signal:controller.signal});
+    if(!response.ok)throw new Error(`Health check failed (${response.status})`);
+    const health=await response.json();
+    if(health.ready!==true)throw new Error('Decoder is starting');
+    if(controller.signal.aborted||!visible||healthStopped)return;
+    const recovered=!online;online=true;healthFailures=0;
+    // A routine successful poll must not interrupt an active decode or reset the view.
+    if(recovered&&scene&&!loadingScene)requestRender();
+  }catch{
+    if(!visible||healthStopped)return;
+    const wasOnline=online;online=false;healthFailures++;
+    if(wasOnline){clearTimeout(debounce);cancelObsoleteView();}
+    connectionStatus();
+  }finally{
+    clearTimeout(timeout);if(healthController===controller)healthController=null;
+    healthInFlight=false;
+    scheduleHealthCheck(online?HEALTH_POLL_MS:HEALTH_RETRY_MS[Math.min(Math.max(0,healthFailures-1),HEALTH_RETRY_MS.length-1)]);
+  }
+}
+function reconnect(){healthFailures=0;scheduleHealthCheck(0);}
+window.addEventListener('online',reconnect);
+window.addEventListener('offline',()=>{online=false;stopHealthChecks();clearTimeout(debounce);cancelObsoleteView();connectionStatus();scheduleHealthCheck(1000);});
+window.addEventListener('focus',()=>{if(!online)reconnect();});
+window.addEventListener('pageshow',event=>{if(event.persisted){healthStopped=false;visible=!document.hidden;reconnect();}});
 
 // The diagram uses perspective projection of metric 3D camera frusta. Its
 // observer is independent of the query camera used by the neural decoder.
@@ -761,7 +807,7 @@ if(window.parent!==window){try{
   parent.document.addEventListener('keydown',parentKey);
   window.addEventListener('pagehide',()=>parent.document.removeEventListener('keydown',parentKey));
 }catch{/* Cross-origin embeds still support keyboard control inside the demo. */}}
-document.addEventListener('visibilitychange',()=>{visible=!document.hidden;if(!visible){stop();clearTimeout(debounce);cancelBackground();releasePreviewPriority();}else if(scene)requestRender();});
+document.addEventListener('visibilitychange',()=>{visible=!document.hidden;if(!visible){stopHealthChecks();stop();clearTimeout(debounce);cancelBackground();releasePreviewPriority();}else{if(scene)requestRender();reconnect();}});
 if(window.parent!==window){const observer=new ResizeObserver(()=>parent.postMessage({type:'geostate-demo-height',height:Math.ceil(document.body.getBoundingClientRect().height)},location.origin));observer.observe(document.body);}
 async function start(){try{const response=await fetch('manifest.json',{cache:'no-store'});if(!response.ok)throw new Error('Selected scene manifest is unavailable');scenes=(await response.json()).scenes;renderCards();await select(scenes[0]);await checkHealth();}catch(error){errorStatus(error);}}
 start();
